@@ -6,36 +6,30 @@ library(plotrix)
 # set parameters
 argv <- commandArgs(T)
 config_file <- argv[1]
-count_dir <- argv[2]
-count_all <- argv[3]
-cpm_all <- argv[4]
-cpm_DEG <- argv[5]
-DEG_barplot <- argv[6]
-DEG_matrix <- argv[7]
-
+count_file <- argv[2]
+#config_file <- '../config.yaml'
+#count_file <- '../count/all_sample_cnt.tsv'
+  
 # load data
 config <- yaml.load_file(config_file)
-files <- paste0(count_dir, '/', config$samples, '_cnt.tsv')
-count <- do.call("cbind", lapply(files, read.table, sep='\t', row.names=1))
-colnames(count) <- config$samples
-count <- count[-grep('^__', rownames(count)), ]
-write.table(count, count_all, col.names=NA, sep='\t', quote=F)
+count <- read.table(count_file, header = 1, row.names = 1)
 
 # Differentially Expressed Genes (DEGs)
+# fc: fold-change of expression level
 fc <- 2
 p_cutoff <- 0.05
 fc_cutoff <- log2(fc)
 group <- factor(config$groups)
-VS <- as.data.frame(t(combn(levels(group), 2)), stringsAsFactors = F)
+VS <- as.data.frame(t(combn(unique(config$groups), 2)), stringsAsFactors = F)
 colnames(VS) <- c('Ctrl', 'Expt')
 
 ## reading the data into the DGEList object ##
 print(group)
-y <- DGEList(counts=count, group=group)
+y <- DGEList(counts = count, group = group)
 
-## filtering ##
+## filtering lowly expressed genes ##
 minGroupSize <- min(table(group))
-keep <- rowSums(cpm(y)>1) >= minGroupSize
+keep <- rowSums(cpm(y) > 1) >= minGroupSize
 y <- y[keep,]
 y$samples$lib.size <- colSums(y$counts)
 
@@ -45,45 +39,53 @@ y <- estimateCommonDisp(y, verbose=T)
 y <- estimateTagwiseDisp(y)
 
 ## exact test ##
-profile <- round(cpm(y), 2)
-regulate <- NULL
-logfc <- NULL
-fdr <- NULL
+expr_cols <- round(cpm(y), 2)
+regulate_cols <- NULL
+logfc_cols <- NULL
+fdr_cols <- NULL
 
 for(i in 1:(nrow(VS))){
   ctr <- VS$Ctrl[i]
   exp <- VS$Expt[i]
   cat(paste('testing Exp:', exp, '- Ctr:', ctr, '\t'))
-  et <- exactTest(y, pair=c(ctr, exp))
-  de <- decideTestsDGE(et, p.value=p_cutoff, lfc=fc_cutoff)
-  fc <- round(et$table$logFC, 3)
+  et <- exactTest(y, pair=c(ctr, exp)) 
+  # Note that the first group listed in the pair is the baseline for the comparison—
+  # so if the pair is c("A","B") then the comparison is B - A, so genes with 
+  # positive log-fold change are up-regulated in group B compared with group A 
+  # (and vice versa for genes with negative log-fold change).
+  de <- decideTestsDGE(et, p.value=p_cutoff, lfc=fc_cutoff, adjust.method='fdr')
   p <- sprintf('%.3e', p.adjust(et$table$PValue, method='fdr'))
-  regulate <- cbind(regulate, de)
-  logfc <- cbind(logfc, fc)
-  fdr <- cbind(fdr, p)
-  colnames(regulate)[ncol(regulate)] <- paste0(exp, '_vs_', ctr)      
-  colnames(logfc)[ncol(logfc)] <- paste0(exp, '_vs_', ctr, '_logFC')      
-  colnames(fdr)[ncol(fdr)] <- paste0(exp, '_vs_', ctr, '_FDR')      
-  cat(paste('UP-regulated', sum(de > 0), 'genes\t'))
-  cat(paste('DOWN-regulated', sum(de < 0), 'genes\n'))
+  regulate_cols <- cbind(regulate_cols, de)
+  logfc_cols <- cbind(logfc_cols, round(et$table$logFC, 3))
+  fdr_cols <- cbind(fdr_cols, p)
+  colnames(regulate_cols)[i] <- paste0(exp, '_vs_', ctr)      
+  colnames(logfc_cols)[i] <- paste0(exp, '_vs_', ctr, '_logFC')      
+  colnames(fdr_cols)[i] <- paste0(exp, '_vs_', ctr, '_FDR')      
+  cat(paste('UP-regulated in', exp, sum(de > 0), 'genes\t'))
+  cat(paste('DOWN-regulated in', exp, sum(de < 0), 'genes\n'))
 }
-profile <- cbind(rownames(profile), profile)
-colnames(profile)[1] = 'Gene'
-profile1 <- cbind(profile, regulate)
-profile2 <- cbind(profile1, logfc)
-profile2 <- cbind(profile2, fdr)
-profile3 <- profile2[rowSums(regulate!=0) >= 1,]
-write.table(profile2, cpm_all, row.names=F, sep='\t', quote=F)
-write.table(profile3, cpm_DEG, row.names=F, sep='\t', quote=F)
 
-regulate.stat <- apply(as.matrix(regulate), 2, function(x){table(x)[c('1','-1')]})
+expr_table <- as.data.frame(cbind(expr_cols, regulate_cols, logfc_cols, fdr_cols), stringsAsFactors = F)
+
+anno <- read.table(config$gene_anno, sep='\t', header = T)
+expr_table <- merge(expr_table, anno, by.x = 0, by.y = 1, all.x = T)
+colnames(expr_table)[1] <- 'Gene'
+
+DEG_table <- expr_table[rowSums(regulate_cols != 0) >= 1,]
+
+write.table(expr_table, 'table/expr_table_cpm_all.tsv', row.names=F, sep='\t', quote=F)
+write.table(DEG_table, 'table/expr_table_cpm_DEG.tsv', row.names=F, sep='\t', quote=F)
+
+save(list = c('expr_table', 'DEG_table'), file = 'RData/edgeR_output.RData')
+
+## Number of DEGs (barplot)
+regulate.stat <- apply(as.matrix(regulate_cols), 2, function(x){table(x)[c('1','-1')]})
 rownames(regulate.stat) <- c('up','down')
 cols <- brewer.pal(3,'Set1')
 upmax <- 1.2*max(regulate.stat['up',], na.rm=T)
 dnmax <- 1.2*max(regulate.stat['down',], na.rm=T)
 
-## Number of DEGs (barplot)
-pdf(DEG_barplot)
+pdf('figure/DEG_barplot.pdf')
 par(mar=c(8,4,4,2))
 barplot(regulate.stat[1,], ylim=c(-dnmax,upmax), col=cols[2], border=cols[2], yaxt='n', las=2)
 bp <- barplot(-regulate.stat[2,], add=T, names=NA, col=cols[3], border=cols[3], ylab='The number of DEGs', yaxt='n')
@@ -97,7 +99,6 @@ dev.off()
 ## Number of DEGs (matrix)
 col_reds <- brewer.pal(9, 'Reds')
 col_blues <- brewer.pal(9, 'Blues')
-
 mat_up <- NULL
 mat_dn <- NULL
 for (i in 1:nrow(VS)) {
@@ -118,7 +119,7 @@ cellcol<-matrix(rep("#FFFFFF", n^2), nrow=n)
 cellcol[x > 0] <- color.scale(x[x > 0], extremes=c(col_reds[1], col_reds[7]))
 cellcol[x < 0] <- color.scale(x[x < 0], extremes=c(col_blues[7], col_blues[1]))
 
-pdf(DEG_matrix)
+pdf('figure/DEG_matrix.pdf')
 par(xpd=T)
 par(mar=c(5,4,4,9))
 color2D.matplot(x, cellcolors=cellcol, border='gray', axes = F, xlab='', ylab='', main='Number of DEGs')
