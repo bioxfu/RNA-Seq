@@ -15,5 +15,5 @@ track
 Snakefile
 config.yaml
 doc/environment.yml
-
+download_sra.sh
 
