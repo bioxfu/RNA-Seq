@@ -19,17 +19,17 @@ git checkout project
 
 ### 5. Initiate the project
 ```
-bash init.sh
+source init.sh
 ```
 
 ### 6. Dry run the workflow to check any mistakes
 ```
-bash dry_run.sh
+./dry_run.sh
 ```
 
 ### 7. Start the workflow
 ```
-bash run.sh
+./run.sh
 ```
 
 ### 8. Check the workflow progress in *nohup.out* 
