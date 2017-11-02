@@ -2,6 +2,7 @@ species: human
 
 seq_info:
   type: RNA-Seq
+  stranded: yes
   mode: SE
   replicate: 3
 
@@ -17,6 +18,10 @@ samples:
 
 groups:
   - WT
+  - WT
+  - WT
+  - KO
+  - KO
   - KO
 
 group_info:
@@ -25,7 +30,7 @@ group_info:
 
 cpu: 30
 
-strandness_hisat2: R
+strandness_hisat2: R ## R (SE); RF (PE)
 
 strandness_htseq: reverse
 
