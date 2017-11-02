@@ -34,3 +34,8 @@ source init.sh
 
 ### 8. Check the workflow progress in *nohup.out* 
 
+### 9. Remove the temporary files
+```
+./clean.sh
+```
+
