@@ -1,2 +1,14 @@
 .snakemake
 .Rhistory
+nohup.log
+AS
+bam
+clean
+count
+fastq
+fastqc
+figure
+RData
+stat
+table
+track
