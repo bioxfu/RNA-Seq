@@ -1,0 +1,101 @@
+---
+title: "Work Report"
+author: "Fu Xing"
+date: '`r date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, comment = '')
+library(yaml)
+config <- yaml.load_file('../config.yaml')
+env <- yaml.load_file('environment.yml')
+
+version <- function(x) {
+  v <- strsplit(grep(paste0('^',x), unlist(env$dependencies), value = T), '=')
+  i <- 2
+  if (names(v) == 'pip') {
+    i <- 3
+  }
+  return(v[[1]][i])
+}
+```
+
+## 1. Basic Information
+```{r}
+cat('Species:', config$species)
+cat('Genome assembly:', rev(strsplit(config$index, '/')[[1]])[2])
+cat('Sequencing Type:', config$seq_info$type)
+cat('Sequencing Mode:', config$seq_info$mode)
+cat('Replication number:', config$seq_info$replicate)
+```
+
+## 2. Sample Information
+```{r}
+data.frame(names = config$samples, groups = config$groups)
+data.frame(group_info = unlist(config$group_info))
+```
+
+## 3. Workflow
+![](workflow.svg)
+
+## 4. Results
+### 4.1 Reads quality
+We used **FastQC** (version `r version('fastqc')`) to check the sequencing quality. 
+
+- [Output of FastQC](../fastqc)
+
+### 4.2 Trim adapter sequence
+We used **Trimmomatic** (version `r version('trimmomatic')`) to trim the adapter sequences and low quality reads. 
+
+- [Output of Trimmomatic (clean reads)](../clean)
+
+### 4.3 Reads mapping
+We used **hisat2** (version `r version('hisat2')`) to map the clean reads. The multiple mapped reads were discarded by **samtools** (version `r version('samtools')`). We also checked the mapping quality by **qualimap** (version `r version('qualimap')`) 
+
+- [Output of hisat2 and qualimap (bam and bamqc)](../bam)
+
+### 4.4 IGV tracks 
+We used **bedtools** (version `r version('bedtools')`) and **igvtools** (version `r version('igvtools')`) to generate normalized read coverage profiles (Reads per Million) for each sample. The tdf files must be viewed in [IGV](http://software.broadinstitute.org/software/igv/). 
+
+- [Tracks](../track)
+
+### 4.5 Gene expression
+We used **htseq-count** (version `r version('htseq')`) to count number of reads per gene for each sample.
+
+- [Gene counts](../count)
+
+### 4.6 Sample quality
+We check the sample quality by PCA plot. The colors represent the different groups. The points with the same color represent the  replicates under the same experimental condition.
+
+- [PCA plot](../figure/PCA.pdf)
+
+### 4.7 Differentially Expressed Genes (DEGs) 
+We used **edgeR** (version `r version('bioconductor-edger')`) to indentify the DEGs between two groups. The cutoff is **adjusted p-value (FDR) < 0.05 and fold-change > 2**. The number of DEGs of each comparision were shown in the [barplot](../figure/DEG_num_barplot.pdf) and [matrixplot](../figure/DEG_num_matrix.pdf). The following tables include normalized expression values, log2FC and FDR for all genes and DEGs, respectively.
+
+- [Gene tables (all)](../table/gene_expr_cpm.tsv)
+- [Gene tables (DEGs)](../table/DEG_expr_cpm.tsv)
+
+### 4.8 Clustering
+We performed *hierarchical* and *k-means* clustering on DEGs by **pheatmap** (version `r version('r-pheatmap')`). One common method of choosing the appropriate cluster solution (k) is to compare the sum of squared error (SSE) for a number of cluster solutions. The details of the method can be found [here](http://www.mattpeeples.net/kmeans.html). In brief, we choose the cluster solution at the "elbow" in the [SSE plot](../figure/DEG_kmeans_clustering_withinss.pdf).
+
+- [hierarchical clustering](../figure/DEG_hierarchical_clustering.png)
+- [k-means clustering (k=4)](../figure/DEG_kmeans_4_clusters.png)
+- [k-means clustering (k=6)](../figure/DEG_kmeans_6_clusters.png)
+- [k-means clustering (k=8)](../figure/DEG_kmeans_8_clusters.png)
+
+### 4.9 K-means cluster profiling
+We divided the DEGs into **`r config$kmean`** clusters by *k-means* clustering and visualized the gene expression profiles in each cluster. We also identified the transcription factors (TFs) in each cluster. The cluster number of each gene/TF were listed in the following tables: 
+
+- [Cluster number of each gene](../table/DEG_kmeans_all.tsv)
+- [Cluster number of each TF](../table/DEG_kmeans_TF.tsv)
+
+### 4.10 GO enrichment analysis
+We performed GO enrichment analysis on each cluster of genes by **topGO** (version `r version('bioconductor-topgo')`). 
+
+- [Significantlly enriched GO terms](../table/GO_enrich_k-means.xlsx)
+
+***
+
+
+

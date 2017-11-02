@@ -1,0 +1,50 @@
+species: human
+
+seq_info:
+  type: RNA-Seq
+  mode: SE
+  replicate: 3
+
+path: /home/xfu/Project/XXX/fastq/
+
+samples:
+  - WT_1
+  - WT_2
+  - WT_3
+  - KO_1
+  - KO_2
+  - KO_3
+
+groups:
+  - WT
+  - KO
+
+group_info:
+  WT: wild-type
+  KO: knock-out
+
+cpu: 30
+
+strandness_hisat2: R
+
+strandness_htseq: reverse
+
+Rscript_path: /home/xfu/R/3.2.4/bin/Rscript
+
+adapter: /home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/TruSeq3-PE-2.fa
+
+
+index: /home/xfu/Gmatic6/genome/hg38/hg38
+
+gtf: /home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26.gtf
+
+bed: /home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26.bed
+
+gene_anno: /home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26_gene_type_name
+
+AS: /home/xfu/Gmatic6/gene/hg38_v26/ASTA/gencode_astalavista.bed
+
+AS_RI:  /home/xfu/Gmatic6/gene/hg38_v26/ASTA/gencode_astalavista_RI.bed
+
+IGV: /home/xfu/igv/genomes/hg38.genome
+
