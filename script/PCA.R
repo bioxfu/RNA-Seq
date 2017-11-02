@@ -5,12 +5,14 @@ library(yaml)
 argv <- commandArgs(T)
 config_file <- argv[1]
 cpm_all <- argv[2]
+#config_file <- '../config.yaml'
+#cpm_all <- '../table/expr_table_cpm_all.tsv'
 pca_output <- argv[3]
 
 # load data
 config <- yaml.load_file(config_file)
 cpm <- read.table(cpm_all, head=T, row.names = 1)
-cpm <- cpm[-grep('_vs_', colnames(cpm))]
+cpm <- cpm[1:(grep('_vs_', colnames(cpm))[1] - 1)]
 cpm <- log2(cpm+1)
 pca <- prcomp(t(cpm), center = T, scale. = T)
 
