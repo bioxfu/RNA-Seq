@@ -12,3 +12,8 @@ RData
 stat
 table
 track
+Snakefile
+config.yaml
+doc/environment.yml
+
+
