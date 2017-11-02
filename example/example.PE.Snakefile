@@ -33,6 +33,12 @@ rule all:
 		'AS/all_sample_ALE.tsv',
 		'AS/all_sample_A3SS.tsv',
 		'AS/all_sample_A5SS.tsv',
+		'table/expr_table_cpm_all.tsv',
+		'table/expr_table_cpm_DEG.tsv',
+		'figure/DEG_barplot.pdf',
+		'figure/DEG_matrix.pdf',
+		'RData/edgeR_output.RData',
+		'figure/PCA.pdf',
 
 rule fastqc_raw_PE:
 	input:
@@ -251,3 +257,29 @@ rule merge_AS_tables:
 		Rscript = config['Rscript_path']
 	shell:
 		'{params.Rscript} script/merge_AS_tables.R {params.config_file}'
+
+rule edgeR:
+	input:
+		count_all = 'count/all_sample_cnt.tsv',
+	output:
+		cpm_all = 'table/expr_table_cpm_all.tsv',
+		cpm_DEG = 'table/expr_table_cpm_DEG.tsv',
+		DEG_barplot = 'figure/DEG_barplot.pdf',
+		DEG_matrix = 'figure/DEG_matrix.pdf',
+		RData = 'RData/edgeR_output.RData'
+	params:
+		config_file = 'config.yaml',
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/edgeR.R {params.config_file} {input}'
+
+rule PCA:
+	input:
+		cpm_all = 'table/expr_table_cpm_all.tsv'
+	output:
+		pca_output = 'figure/PCA.pdf'
+	params:
+		config_file = 'config.yaml',
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/PCA.R {params.config_file} {input} {output}'
