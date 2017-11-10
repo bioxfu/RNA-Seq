@@ -189,12 +189,19 @@ rule ASFinder:
 		bam = 'bam/{sample}.bam',
 		junction_counts = 'count/{sample}_junction_counts'
 	output:
-		outdir = 'AS/{sample}'
+		outdir = 'AS/{sample}',
+		SE = 'AS/{sample}/SE.txt',
+		RI = 'AS/{sample}/RI.txt',
+		MXE = 'AS/{sample}/MXE.txt',
+		AFE = 'AS/{sample}/AFE.txt',
+		ALE = 'AS/{sample}/ALE.txt',
+		A3SS = 'AS/{sample}/A3SS.txt',
+		A5SS = 'AS/{sample}/A5SS.txt'
 	params:
 		bed = config['AS'],
 		bed_RI = config['AS_RI']
 	shell:
-		"python script/ASFinder.py {input.bam} {input.junction_counts} {params.bed} {params.bed_RI} {output}"
+		"python script/ASFinder.py {input.bam} {input.junction_counts} {params.bed} {params.bed_RI} {output.outdir}"
 
 rule bam2count:
 	input:
