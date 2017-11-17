@@ -47,7 +47,7 @@ grp_ctrl <- grp[1]
 grp_expt <- grp[-1]
 
 dfm_no_ratio <- dfm[, -grep('inclusion_ratio', colnames(dfm))]
-dfm_ctrl <- dfm_no_ratio[, grep(paste0(grp_ctrl, '_'), colnames(dfm_no_ratio))]
+dfm_ctrl <- dfm_no_ratio[, grep(paste0(grp_ctrl, '.*_'), colnames(dfm_no_ratio))]
 r <- config$seq_info$replicate
 
 if (r > 1) {
@@ -64,7 +64,7 @@ if (r > 1) {
 test_result <- list()
 
 for (i in 1:length(grp_expt)) {
-  dfm_expt <- dfm_no_ratio[, grep(paste0(grp_expt[i], '_'), colnames(dfm_no_ratio))]
+  dfm_expt <- dfm_no_ratio[, grep(paste0(grp_expt[i], '.*_'), colnames(dfm_no_ratio))]
   if (r > 1) {
     n <- ncol(dfm_expt)
     l <- n/r
