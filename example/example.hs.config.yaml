@@ -53,3 +53,11 @@ AS_RI:  /home/xfu/Gmatic6/gene/hg38_v26/ASTA/gencode_astalavista_RI.bed
 
 IGV: /home/xfu/igv/genomes/hg38.genome
 
+AStype:
+  - SE
+  - RI
+  - A3SS
+  - A5SS
+  - AFE
+  - ALE
+  - MXE

@@ -1,61 +1,84 @@
-#! /usr/bin/Rscript
+library(yaml)
 
-args = commandArgs(trailingOnly = T)
-AS_type = c('SE', 'A5SS', 'A3SS', 'AFE', 'ALE', 'MXE', 'RI')
-
-#args = c('../../AS/W1', '../../AS/W2', 'W1', 'W2')
-#AS='RI'
-
-for (AS in AS_type) {
-    print(AS)
-    input1 = read.table(paste(args[1],'/',AS,'.txt',sep=''), header = T, row.names = 1)
-    input2 = read.table(paste(args[2],'/',AS,'.txt',sep=''), header = T, row.names = 1)
-    colnames(input1) = paste(args[3], '_', colnames(input1), sep='')
-    colnames(input2) = paste(args[4], '_', colnames(input2), sep='')
-    input3 = round(cbind(input1, input2))
-    
-    if(AS == 'SE') {
-        input = cbind((input1[1] + input1[2] + input1[3]), input1[4], (input2[1] + input2[2] + input2[3]), input2[4])
+AS_fisher_test <- function(dfm_ctrl, dfm_expt, AS, pref) {
+  print(pref)
+  if (AS == 'SE') {
+    input <- cbind((dfm_ctrl[1] + dfm_ctrl[2] + dfm_ctrl[3]), dfm_ctrl[4], (dfm_expt[1] + dfm_expt[2] + dfm_expt[3]), dfm_expt[4])
+  }
+  if(AS == 'RI') {
+    input <- cbind(dfm_ctrl, dfm_expt)
+  }
+  if(AS == 'A5SS' || AS == 'A3SS') {
+    input <- cbind((dfm_ctrl[1] + dfm_ctrl[2]), dfm_ctrl[3], (dfm_expt[1] + dfm_expt[2]), dfm_expt[3])
+  }
+  if(AS == 'AFE' || AS == 'ALE') {
+    input <- cbind((dfm_ctrl[1] + dfm_ctrl[2]), (dfm_ctrl[3] + dfm_ctrl[4]), (dfm_expt[1] + dfm_expt[2]), (dfm_expt[3] + dfm_expt[4]))
+  }
+  if(AS == 'MXE') {
+    input <- cbind((dfm_ctrl[1] + dfm_ctrl[2] + dfm_ctrl[3]), (dfm_ctrl[4] + dfm_ctrl[5] + dfm_ctrl[6]), (dfm_expt[1] + dfm_expt[2] + dfm_expt[3]), (dfm_expt[4] + dfm_expt[5] + dfm_expt[6]))
+  }
+  input <- round(input)
+  pvalue <- apply(input, 1, function(x) {
+    if ( (x[1] + x[2]) > 0 & (x[3] + x[4]) > 0 ) {
+      return(fisher.test(matrix(x, nrow=2, ncol=2))$p.value)
     }
-    if(AS == 'RI') {
-        input = input3
-    }
-    if(AS == 'A5SS' || AS == 'A3SS') {
-        input = cbind((input1[1] + input1[2]), input1[3], (input2[1] + input2[2]), input2[3])
-    }
-    if(AS == 'AFE' || AS == 'ALE') {
-        input = cbind((input1[1] + input1[2]), (input1[3] + input1[4]), (input2[1] + input2[2]), (input2[3] + input2[4]))
-    }
-    if(AS == 'MXE') {
-        input = cbind((input1[1] + input1[2] + input1[3]), (input1[4] + input1[5] + input1[6]), (input2[1] + input2[2] + input2[3]), (input2[4] + input2[5] + input2[6]))
-    }
-    
-    filter = (input[1]+input[2]) > 0 & (input[3]+input[4]) > 0
-    input = input[filter, ]
-    input3 = input3[filter, ]
-    input3$diff_ratio = round(input[,3]/(input[,3]+input[,4]) - input[,1]/(input[,1]+input[,2]),3)
-    pvalue = apply(input, 1, function(x) {fisher.test(matrix(x,nrow=2,ncol=2))$p.value})
-    fdr = p.adjust(pvalue,method='fdr')
-    input3$pvalue = pvalue
-    input3$fdr = fdr
-    output = input3[order(input3$pvalue), ]
-    output_up = output[output$diff_ratio > 0, ]
-    output_dn = output[output$diff_ratio < 0, ]
-    output_up$change = 'up'
-    output_dn$change = 'dn'
-    output_all = rbind(output_up, output_dn)
-    output_sig = output_all[output_all$pvalue < 0.05,]
-    output_nonsig = output_all[output_all$pvalue > 0.95,]
-    output_sig$pvalue = sprintf('%.1e', output_sig$pvalue)
-    output_sig$fdr = sprintf('%.1e', output_sig$fdr)
-    output_nonsig$pvalue = sprintf('%.1e', output_nonsig$pvalue)
-    output_nonsig$fdr = sprintf('%.1e', output_nonsig$fdr)
-    write.table(output_sig, paste(args[5],'_',AS,'_sig.txt',sep=''), quote = F, col.names = NA, sep = '\t')
-    write.table(output_all, paste(args[5],'_',AS,'_all.txt',sep=''), quote = F, col.names = NA, sep = '\t')
-    #write.table(output_nonsig, paste(args[5],'_',AS,'_nonsig.txt',sep=''), quote = F, col.names = NA, sep = '\t')
-    #output_all = input3[abs(input3$diff_ratio) > 0.1, ]
-    #output_all = output_all[order(output_all$diff_ratio), ]
-    #write.table(output_all, paste(args[4], '_diff_ratio_0.1.txt', sep=''), quote = F, col.names = NA, sep = '\t')
+    else {
+      return(1)
+    }})
+  fdr <- p.adjust(pvalue, method='fdr')
+  result <- data.frame(pvalue = round(pvalue, 4), fdr = round(fdr, 4))
+  colnames(result) <- paste0(pref, '_', colnames(result))
+  return(result)
 }
 
+#=====================
+argv <- commandArgs(trailingOnly = T)
+config_file <- argv[1]
+input_file <- argv[2]
+output_file <- argv[3]
+
+config <- yaml.load_file(config_file)
+AS_type <- sub('.+all_sample_', '', input_file)
+AS_type <- sub('.tsv', '', AS_type)
+
+dfm <- read.table(input_file, head=T)
+grp <- unique(config$groups)
+grp_ctrl <- grp[1]
+grp_expt <- grp[-1]
+
+dfm_no_ratio <- dfm[, -grep('inclusion_ratio', colnames(dfm))]
+dfm_ctrl <- dfm_no_ratio[, grep(paste0(grp_ctrl, '_'), colnames(dfm_no_ratio))]
+r <- config$seq_info$replicate
+
+if (r > 1) {
+  n <- ncol(dfm_ctrl)
+  l <- n/r
+  s <- seq(1, n, by=l)
+  dfm_ctrl2 <- dfm_ctrl[, 1:l]
+  for (n in 2:length(s)) {
+    dfm_ctrl2 <- dfm_ctrl2 + dfm_ctrl[, s[n]:(s[n]+l-1)]
+  }
+  dfm_ctrl <- dfm_ctrl2
+}
+
+test_result <- list()
+
+for (i in 1:length(grp_expt)) {
+  dfm_expt <- dfm_no_ratio[, grep(paste0(grp_expt[i], '_'), colnames(dfm_no_ratio))]
+  if (r > 1) {
+    n <- ncol(dfm_expt)
+    l <- n/r
+    s <- seq(1, n, by=l)
+    dfm_expt2 <- dfm_expt[, 1:l]
+    for (n in 2:length(s)) {
+      dfm_expt2 <- dfm_expt2 + dfm_expt[, s[n]:(s[n]+l-1)]
+    }
+    dfm_expt <- dfm_expt2
+  }
+  test_result[[i]] <- AS_fisher_test(dfm_ctrl, dfm_expt, AS_type, paste0(grp_ctrl, '_', grp_expt[i]))
+} 
+
+dfm2 <- cbind(dfm, do.call(cbind, test_result))
+
+write.table(dfm2, output_file, sep='\t', quote = F, col.names = NA)
 

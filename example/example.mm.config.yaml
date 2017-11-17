@@ -53,3 +53,11 @@ AS_RI:  /home/xfu/Gmatic6/gene/mm10_vM13/ASTA/gencode_astalavista_RI.bed
 
 IGV: /home/xfu/igv/genomes/mm10.genome
 
+AStype:
+  - SE
+  - RI
+  - A3SS
+  - A5SS
+  - AFE
+  - ALE
+  - MXE

@@ -26,13 +26,7 @@ rule all:
 		expand('AS/{sample}/ALE.txt', sample=config['samples']),
 		expand('AS/{sample}/A3SS.txt', sample=config['samples']),
 		expand('AS/{sample}/A5SS.txt', sample=config['samples']),
-		'AS/all_sample_SE.tsv',
-		'AS/all_sample_RI.tsv',
-		'AS/all_sample_MXE.tsv',
-		'AS/all_sample_AFE.tsv',
-		'AS/all_sample_ALE.tsv',
-		'AS/all_sample_A3SS.tsv',
-		'AS/all_sample_A5SS.tsv',
+		expand('AS/all_sample_{AStype}_fisher_test.tsv', AStype=config['AStype']),
 		'table/expr_table_cpm_all.tsv',
 		'table/expr_table_cpm_DEG.tsv',
 		'figure/DEG_barplot.pdf',
@@ -252,18 +246,25 @@ rule merge_AS_tables:
 		['AS/{sample}/A3SS.txt'.format(sample=x) for x in config['samples']],
 		['AS/{sample}/A5SS.txt'.format(sample=x) for x in config['samples']]
 	output:
-		'AS/all_sample_SE.tsv',
-		'AS/all_sample_RI.tsv',
-		'AS/all_sample_MXE.tsv',
-		'AS/all_sample_AFE.tsv',
-		'AS/all_sample_ALE.tsv',
-		'AS/all_sample_A3SS.tsv',
-		'AS/all_sample_A5SS.tsv'
+		'AS/all_sample_{AStype}.tsv'
 	params:
 		config_file = 'config.yaml',
 		Rscript = config['Rscript_path']
 	shell:
 		'{params.Rscript} script/merge_AS_tables.R {params.config_file}'
+
+rule fisher_test:
+	input:
+		'AS/all_sample_{AStype}.tsv'
+	output:
+		'AS/all_sample_{AStype}_fisher_test.tsv'
+	params:
+		config_file = 'config.yaml',
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/AS_fisher_test.R {params.config_file} {input} {output}'
+
+ruleorder: fisher_test > merge_AS_tables 
 
 rule edgeR:
 	input:
