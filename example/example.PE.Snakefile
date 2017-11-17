@@ -255,7 +255,7 @@ rule merge_AS_tables:
 
 rule fisher_test:
 	input:
-		'AS/all_sample_{AStype}.tsv'
+		rules.merge_AS_tables.output
 	output:
 		'AS/all_sample_{AStype}_fisher_test.tsv'
 	params:
