@@ -37,35 +37,38 @@ config_file <- argv[1]
 input_file <- argv[2]
 output_file <- argv[3]
 
+# config_file <- '../config.yaml'
+# input_file <- '../AS/all_sample_SE.tsv'
+
 config <- yaml.load_file(config_file)
 AS_type <- sub('.+all_sample_', '', input_file)
 AS_type <- sub('.tsv', '', AS_type)
 
 dfm <- read.table(input_file, head=T)
-grp <- unique(config$groups)
-grp_ctrl <- grp[1]
-grp_expt <- grp[-1]
-
-dfm_no_ratio <- dfm[, -grep('inclusion_ratio', colnames(dfm))]
-dfm_ctrl <- dfm_no_ratio[, grep(paste0(grp_ctrl, '.*_'), colnames(dfm_no_ratio))]
-r <- config$seq_info$replicate
-
-if (r > 1) {
-  n <- ncol(dfm_ctrl)
-  l <- n/r
-  s <- seq(1, n, by=l)
-  dfm_ctrl2 <- dfm_ctrl[, 1:l]
-  for (n in 2:length(s)) {
-    dfm_ctrl2 <- dfm_ctrl2 + dfm_ctrl[, s[n]:(s[n]+l-1)]
-  }
-  dfm_ctrl <- dfm_ctrl2
-}
+grp <- config$groups
 
 test_result <- list()
 
-for (i in 1:length(grp_expt)) {
-  dfm_expt <- dfm_no_ratio[, grep(paste0(grp_expt[i], '.*_'), colnames(dfm_no_ratio))]
+for (vs in config$group_vs) {
+  x <- strsplit(vs, ' ')[[1]]
+  grp_ctrl <- grp[as.numeric(x[1])]
+  grp_expt <- grp[as.numeric(x[2])]
+  dfm_no_ratio <- dfm[, -grep('inclusion_ratio', colnames(dfm))]
+  dfm_ctrl <- dfm_no_ratio[, grep(paste0(grp_ctrl, '.*_'), colnames(dfm_no_ratio))]
+  dfm_expt <- dfm_no_ratio[, grep(paste0(grp_expt, '.*_'), colnames(dfm_no_ratio))]
+
+  r <- config$seq_info$replicate
+  
   if (r > 1) {
+    n <- ncol(dfm_ctrl)
+    l <- n/r
+    s <- seq(1, n, by=l)
+    dfm_ctrl2 <- dfm_ctrl[, 1:l]
+    for (n in 2:length(s)) {
+      dfm_ctrl2 <- dfm_ctrl2 + dfm_ctrl[, s[n]:(s[n]+l-1)]
+    }
+    dfm_ctrl <- dfm_ctrl2
+
     n <- ncol(dfm_expt)
     l <- n/r
     s <- seq(1, n, by=l)
@@ -75,10 +78,9 @@ for (i in 1:length(grp_expt)) {
     }
     dfm_expt <- dfm_expt2
   }
-  test_result[[i]] <- AS_fisher_test(dfm_ctrl, dfm_expt, AS_type, paste0(grp_ctrl, '_', grp_expt[i]))
+  test_result <- c(test_result, AS_fisher_test(dfm_ctrl, dfm_expt, AS_type, paste0(grp_ctrl, '_', grp_expt)))
 } 
-
+  
 dfm2 <- cbind(dfm, do.call(cbind, test_result))
-
 write.table(dfm2, output_file, sep='\t', quote = F, col.names = NA)
 

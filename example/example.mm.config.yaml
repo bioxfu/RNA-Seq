@@ -24,6 +24,9 @@ groups:
   - KO
   - KO
 
+group_vs: 
+  - 1 4
+
 group_info:
   WT: wild-type
   KO: knock-out
