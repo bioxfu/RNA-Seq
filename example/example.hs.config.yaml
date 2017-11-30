@@ -48,7 +48,7 @@ gtf: /home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26.gtf
 
 bed: /home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26.bed
 
-gene_anno: /home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26_gene_type_name
+gene_anno: /home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26_gene_type
 
 AS: /home/xfu/Gmatic6/gene/hg38_v26/ASTA/gencode_astalavista.bed
 

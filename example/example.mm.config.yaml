@@ -48,7 +48,7 @@ gtf: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13.gtf
 
 bed: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13.bed
 
-gene_anno: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13_gene_type_name
+gene_anno: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13_gene_type
 
 AS: /home/xfu/Gmatic6/gene/mm10_vM13/ASTA/gencode_astalavista.bed
 
