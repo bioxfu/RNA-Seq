@@ -30,6 +30,8 @@ rule all:
 		'figure/DEG_matrix.pdf',
 		'RData/edgeR_output.RData',
 		'figure/PCA.pdf',
+#		if no replicate is available:
+#		'table/expr_table_cpm_no_replicate.tsv',
 
 rule fastqc_raw_SE:
 	input:
@@ -266,6 +268,17 @@ rule edgeR:
 		Rscript = config['Rscript_path']
 	shell:
 		'{params.Rscript} script/edgeR.R {params.config_file} {input}'
+
+rule edgeR_no_replicate:
+	input:
+		count_all = 'count/all_sample_cnt.tsv',
+	output:
+		cpm_all = 'table/expr_table_cpm_no_replicate.tsv',
+	params:
+		config_file = 'config.yaml',
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/edgeR_no_replicate.R {params.config_file} {input}'
 
 rule PCA:
 	input:
