@@ -16,7 +16,7 @@ count <- read.table(count_file, header = 1, row.names = 1)
 
 # Differentially Expressed Genes (DEGs)
 # fc: fold-change of expression level
-fc <- 2
+fc <- config$fold_change
 p_cutoff <- 0.05
 fc_cutoff <- log2(fc)
 group <- factor(config$groups)
@@ -67,8 +67,8 @@ for(i in 1:(nrow(VS))){
 
 expr_table <- as.data.frame(cbind(expr_cols, regulate_cols, logfc_cols, fdr_cols), stringsAsFactors = F)
 
-anno <- read.table(config$gene_anno, sep='\t', header = T)
-expr_table <- merge(expr_table, anno, by.x = 0, by.y = 1, all.x = T)
+anno <- read.table(config$gene_anno, sep='\t', header = T, quote = '', row.names = 1)
+expr_table <- merge(expr_table, anno, by.x = 0, by.y = 0, all.x = T)
 colnames(expr_table)[1] <- 'Gene'
 
 DEG_table <- expr_table[rowSums(regulate_cols != 0) >= 1,]
@@ -80,6 +80,7 @@ save(list = c('expr_table', 'DEG_table'), file = 'RData/edgeR_output.RData')
 
 ## Number of DEGs (barplot)
 regulate.stat <- apply(as.matrix(regulate_cols), 2, function(x){table(x)[c('1','-1')]})
+regulate.stat[is.na(regulate.stat)] <- 0
 rownames(regulate.stat) <- c('up','down')
 cols <- brewer.pal(3,'Set1')
 upmax <- 1.2*max(regulate.stat['up',], na.rm=T)
@@ -96,39 +97,39 @@ text(bp,-regulate.stat[2,], regulate.stat[2,], pos=1)
 legend('topright', c('up','down'), fill=cols[2:3], bty='n',border=F)
 dev.off()
 
-## Number of DEGs (matrix)
-col_reds <- brewer.pal(9, 'Reds')
-col_blues <- brewer.pal(9, 'Blues')
-mat_up <- NULL
-mat_dn <- NULL
-for (i in 1:nrow(VS)) {
-  mat_up <- c(mat_up, rep(as.character(VS[i, ]), regulate.stat['up', i]))
-  mat_dn <- c(mat_dn, rep(as.character(VS[i, ]), regulate.stat['down', i]))
-}
-mat_up <- matrix(mat_up, ncol=2, byrow=T)
-mat_dn <- matrix(mat_dn, ncol=2, byrow=T)
-diff_table_up <- table(as.data.frame(mat_up))
-diff_table_dn <- table(as.data.frame(mat_dn))
-gl <- levels(group)
-n <- length(gl)
-diff_table_all <- matrix(0, nrow=n, ncol=length(gl), dimnames = list(gl, gl))
-diff_table_all[1:(n-1), 2:n] <- diff_table_all[1:(n-1), 2:n] + diff_table_up
-diff_table_all[2:n, 1:(n-1)] <- diff_table_all[2:n, 1:(n-1)] + -t(diff_table_dn)
-x <- diff_table_all
-cellcol<-matrix(rep("#FFFFFF", n^2), nrow=n)
-cellcol[x > 0] <- color.scale(x[x > 0], extremes=c(col_reds[1], col_reds[7]))
-cellcol[x < 0] <- color.scale(x[x < 0], extremes=c(col_blues[7], col_blues[1]))
-
-pdf('figure/DEG_matrix.pdf')
-par(xpd=T)
-par(mar=c(5,4,4,9))
-color2D.matplot(x, cellcolors=cellcol, border='gray', axes = F, xlab='', ylab='', main='Number of DEGs')
-mtext(side = 1, at=1:n-0.5, gl, line=1)
-mtext(side = 2, at=1:n-0.5, rev(gl), line=1, las=2)
-for (i in 1:n) {
-  for (j in 1:n) {
-    text(i-0.5, j-0.5, abs(x[n+1-j, i]))
-  }
-}
-legend(n,n, c('up-regulated', 'down-regulated'), fill=c(col_reds[7], col_blues[7]), border = F, bty='n')
-dev.off()
+# ## Number of DEGs (matrix)
+# col_reds <- brewer.pal(9, 'Reds')
+# col_blues <- brewer.pal(9, 'Blues')
+# mat_up <- NULL
+# mat_dn <- NULL
+# for (i in 1:nrow(VS)) {
+#   mat_up <- c(mat_up, rep(as.character(VS[i, ]), regulate.stat['up', i]))
+#   mat_dn <- c(mat_dn, rep(as.character(VS[i, ]), regulate.stat['down', i]))
+# }
+# mat_up <- matrix(mat_up, ncol=2, byrow=T)
+# mat_dn <- matrix(mat_dn, ncol=2, byrow=T)
+# diff_table_up <- table(as.data.frame(mat_up))
+# diff_table_dn <- table(as.data.frame(mat_dn))
+# gl <- levels(group)
+# n <- length(gl)
+# diff_table_all <- matrix(0, nrow=n, ncol=length(gl), dimnames = list(gl, gl))
+# diff_table_all[1:(n-1), 2:n] <- diff_table_all[1:(n-1), 2:n] + diff_table_up
+# diff_table_all[2:n, 1:(n-1)] <- diff_table_all[2:n, 1:(n-1)] + -t(diff_table_dn)
+# x <- diff_table_all
+# cellcol<-matrix(rep("#FFFFFF", n^2), nrow=n)
+# cellcol[x > 0] <- color.scale(x[x > 0], extremes=c(col_reds[1], col_reds[7]))
+# cellcol[x < 0] <- color.scale(x[x < 0], extremes=c(col_blues[7], col_blues[1]))
+# 
+# pdf('figure/DEG_matrix.pdf')
+# par(xpd=T)
+# par(mar=c(5,4,4,9))
+# color2D.matplot(x, cellcolors=cellcol, border='gray', axes = F, xlab='', ylab='', main='Number of DEGs')
+# mtext(side = 1, at=1:n-0.5, gl, line=1)
+# mtext(side = 2, at=1:n-0.5, rev(gl), line=1, las=2)
+# for (i in 1:n) {
+#   for (j in 1:n) {
+#     text(i-0.5, j-0.5, abs(x[n+1-j, i]))
+#   }
+# }
+# legend(n,n, c('up-regulated', 'down-regulated'), fill=c(col_reds[7], col_blues[7]), border = F, bty='n')
+# dev.off()
