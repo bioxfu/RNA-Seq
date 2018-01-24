@@ -1,0 +1,15 @@
+The explanations of the tables:
+1. fastqc_stat.tsv: the summary of sequencing quality
+2. bamqc_stat.tsv: the summary of mapping quality
+3. expr_table_cpm_all: all the expressed genes
+4. expr_table_cpm_DEG: differentially expressed genes
+
+The explanations of the table columns:
+A: Gene ID
+B-J: the normalized gene expression levels (CPM: counts per million)
+K-M: the index of the DEG (1: up-regulated, -1: down-regulated, 0: no-change)
+N-P: log2(fold-change)
+Q-S: FDR
+T: gene type
+U: description
+

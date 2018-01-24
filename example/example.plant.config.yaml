@@ -1,0 +1,58 @@
+species: human
+
+seq_info:
+  type: RNA-Seq
+  stranded: yes
+  mode: SE
+  replicate: 3
+
+path: /home/xfu/Project/Rosa/RNA-Seq/fastq/
+
+samples:
+  - MOCK_1
+  - MOCK_2
+  - MOCK_3
+  - L2_4_1
+  - L2_4_2
+  - L2_4_3
+  - L2_5_1
+  - L2_5_2
+  - L2_5_3
+
+groups:
+  - MOCK
+  - MOCK
+  - MOCK
+  - L2_4
+  - L2_4
+  - L2_4
+  - L2_5
+  - L2_5
+  - L2_5
+
+group_info:
+  WT: wild-type
+  KO: transgenic
+
+cpu: 30
+
+strandness_hisat2: RF ## R (SE); RF (PE)
+
+strandness_htseq: reverse
+
+Rscript_path: /home/xfu/R/3.2.4/bin/Rscript
+
+adapter: /home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/TruSeq3-PE-2.fa
+
+
+index: /home/xfu/Gmatic5/genome/tair10/tair10
+
+gtf: /home/xfu/Gmatic5/genome/tair10/tair10.gtf
+
+bed: /home/xfu/Gmatic5/genome/tair10/tair10_gene.bed
+
+gene_anno: /home/xfu/Gmatic5/genome/tair10/tair10_gene_anno.tsv
+
+IGV: /home/xfu/igv/genomes/tair10.genome
+
+fold_change: 1.5
