@@ -1,9 +1,9 @@
-species: human
+species: arabidopsis
 
 seq_info:
   type: RNA-Seq
   stranded: yes
-  mode: SE
+  mode: PE
   replicate: 3
 
 path: /home/xfu/Project/Rosa/RNA-Seq/fastq/

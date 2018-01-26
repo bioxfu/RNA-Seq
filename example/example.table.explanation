@@ -4,7 +4,7 @@ The explanations of the tables:
 3. expr_table_cpm_all: all the expressed genes
 4. expr_table_cpm_DEG: differentially expressed genes
 
-The explanations of the table columns:
+The explanations of the table columns (open with Excel):
 A: Gene ID
 B-J: the normalized gene expression levels (CPM: counts per million)
 K-M: the index of the DEG (1: up-regulated, -1: down-regulated, 0: no-change)
@@ -13,3 +13,6 @@ Q-S: FDR
 T: gene type
 U: description
 
+DEG cutoff:
+FDR < 0.05
+Fold-change > 1.5
