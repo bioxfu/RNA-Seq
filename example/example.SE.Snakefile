@@ -27,7 +27,7 @@ rule all:
 		'table/expr_table_cpm_all.tsv',
 		'table/expr_table_cpm_DEG.tsv',
 		'figure/DEG_barplot.pdf',
-		'figure/DEG_matrix.pdf',
+		#'figure/DEG_matrix.pdf',
 		'RData/edgeR_output.RData',
 		'figure/PCA.pdf',
 #		if no replicate is available:
@@ -261,7 +261,7 @@ rule edgeR:
 		cpm_all = 'table/expr_table_cpm_all.tsv',
 		cpm_DEG = 'table/expr_table_cpm_DEG.tsv',
 		DEG_barplot = 'figure/DEG_barplot.pdf',
-		DEG_matrix = 'figure/DEG_matrix.pdf',
+		#DEG_matrix = 'figure/DEG_matrix.pdf',
 		RData = 'RData/edgeR_output.RData'
 	params:
 		config_file = 'config.yaml',
