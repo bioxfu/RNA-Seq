@@ -30,6 +30,10 @@ groups:
   - L2_5
   - L2_5
 
+group_vs:
+  - 1 4
+  - 1 7
+
 group_info:
   WT: wild-type
   KO: transgenic
@@ -56,3 +60,15 @@ gene_anno: /home/xfu/Gmatic5/genome/tair10/tair10_gene_anno.tsv
 IGV: /home/xfu/igv/genomes/tair10.genome
 
 fold_change: 1.5
+
+
+AS: /home/xfu/Gmatic5/genome/tair10/ASTA/gencode_astalavista.bed
+AS_RI:  /home/xfu/Gmatic5/genome/tair10/ASTA/gencode_astalavista_RI.bed
+AStype:
+  - SE
+  - RI
+  - A3SS
+  - A5SS
+  - AFE
+  - ALE
+  - MXE

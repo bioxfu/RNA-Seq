@@ -21,6 +21,17 @@ rule all:
 		'figure/DEG_barplot.pdf',
 		'RData/edgeR_output.RData',
 		'figure/PCA.pdf',
+#		expand('AS/{sample}', sample=config['samples']),
+#		expand('AS/{sample}/SE.txt', sample=config['samples']),
+#		expand('AS/{sample}/RI.txt', sample=config['samples']),
+#		expand('AS/{sample}/MXE.txt', sample=config['samples']),
+#		expand('AS/{sample}/AFE.txt', sample=config['samples']),
+#		expand('AS/{sample}/ALE.txt', sample=config['samples']),
+#		expand('AS/{sample}/A3SS.txt', sample=config['samples']),
+#		expand('AS/{sample}/A5SS.txt', sample=config['samples']),
+#		expand('AS/all_sample_{AStype}_fisher_test.tsv', AStype=config['AStype']),
+#		expand('bam/{sample}.nodup.bam', sample=config['samples']),
+#		expand('bam/{sample}.nodup.bam.bai', sample=config['samples']),
 
 rule fastqc_raw_PE:
 	input:
@@ -189,7 +200,6 @@ rule edgeR:
 		cpm_all = 'table/expr_table_cpm_all.tsv',
 		cpm_DEG = 'table/expr_table_cpm_DEG.tsv',
 		DEG_barplot = 'figure/DEG_barplot.pdf',
-		#DEG_matrix = 'figure/DEG_matrix.pdf',
 		RData = 'RData/edgeR_output.RData'
 	params:
 		config_file = 'config.yaml',
@@ -208,3 +218,87 @@ rule PCA:
 		Rscript = config['Rscript_path']
 	shell:
 		'{params.Rscript} script/PCA.R {params.config_file} {input} {output}'
+
+rule bamtobed12:
+	input:
+		bam = 'bam/{sample}.bam'
+	output:
+		bed12 = 'bam/{sample}.bed12'
+	shell:
+		"bedtools bamtobed -tag NH -split -bed12 -i {input} > {output}"
+
+rule bed12tobed6:
+	input:
+		bed12 = 'bam/{sample}.bed12'
+	output:
+		block_2_3_bed12 = 'bam/{sample}_block_2_3.bed12',
+		block_2_3_bed6 = 'bam/{sample}_block_2_3.bed6'
+	shell:
+		"cat {input} |awk '{{if($5==1 && ($10==2 || $10==3))print}}' > {output.block_2_3_bed12}; bedtools bed12tobed6 -i {output.block_2_3_bed12} -n > {output.block_2_3_bed6}"
+
+rule cal_junc_counts:
+	input:
+		block_2_3_bed6 = 'bam/{sample}_block_2_3.bed6'
+	output:
+		junction_counts = 'count/{sample}_junction_counts'
+	shell:
+		"python script/cal_junc_counts.py {input} > {output}"
+
+rule ASFinder:
+	input:
+		bam = 'bam/{sample}.bam',
+		junction_counts = 'count/{sample}_junction_counts'
+	output:
+		outdir = 'AS/{sample}',
+		SE = 'AS/{sample}/SE.txt',
+		RI = 'AS/{sample}/RI.txt',
+		MXE = 'AS/{sample}/MXE.txt',
+		AFE = 'AS/{sample}/AFE.txt',
+		ALE = 'AS/{sample}/ALE.txt',
+		A3SS = 'AS/{sample}/A3SS.txt',
+		A5SS = 'AS/{sample}/A5SS.txt'
+	params:
+		bed = config['AS'],
+		bed_RI = config['AS_RI']
+	shell:
+		"python script/ASFinder.py {input.bam} {input.junction_counts} {params.bed} {params.bed_RI} {output.outdir}"
+
+rule merge_AS_tables:
+	input:
+		['AS/{sample}/SE.txt'.format(sample=x) for x in config['samples']],
+		['AS/{sample}/RI.txt'.format(sample=x) for x in config['samples']],
+		['AS/{sample}/MXE.txt'.format(sample=x) for x in config['samples']],
+		['AS/{sample}/AFE.txt'.format(sample=x) for x in config['samples']],
+		['AS/{sample}/ALE.txt'.format(sample=x) for x in config['samples']],
+		['AS/{sample}/A3SS.txt'.format(sample=x) for x in config['samples']],
+		['AS/{sample}/A5SS.txt'.format(sample=x) for x in config['samples']]
+	output:
+		'AS/all_sample_{AStype}.tsv'
+	params:
+		config_file = 'config.yaml',
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/merge_AS_tables.R {params.config_file}'
+
+rule fisher_test:
+	input:
+		rules.merge_AS_tables.output
+	output:
+		'AS/all_sample_{AStype}_fisher_test.tsv'
+	params:
+		config_file = 'config.yaml',
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/AS_fisher_test.R {params.config_file} {input} {output}'
+
+ruleorder: fisher_test > merge_AS_tables 
+
+rule MarkDuplicates:
+	input:
+		'bam/{sample}.bam'		
+	output:
+		bam = 'bam/{sample}.nodup.bam',
+		metrics = 'bam/{sample}.nodup.metrics.txt'
+	shell:
+		'picard MarkDuplicates INPUT={input} OUTPUT={output.bam} METRICS_FILE={output.metrics} REMOVE_DUPLICATES=false ASSUME_SORTED=true'
+
