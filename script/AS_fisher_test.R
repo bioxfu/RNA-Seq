@@ -45,6 +45,7 @@ AS_type <- sub('.+all_sample_', '', input_file)
 AS_type <- sub('.tsv', '', AS_type)
 
 dfm <- read.table(input_file, head=T)
+colnames(dfm) <- sub('\\.', '-', colnames(dfm))  #correct sample names which have '-' 
 grp <- config$groups
 
 test_result <- list()
@@ -81,6 +82,6 @@ for (vs in config$group_vs) {
   test_result <- c(test_result, AS_fisher_test(dfm_ctrl, dfm_expt, AS_type, paste0(grp_ctrl, '_', grp_expt)))
 } 
   
-dfm2 <- cbind(dfm, do.call(cbind, test_result))
+dfm2 <- cbind(do.call(cbind, test_result), dfm)
 write.table(dfm2, output_file, sep='\t', quote = F, col.names = NA)
 
