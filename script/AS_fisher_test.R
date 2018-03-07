@@ -45,7 +45,7 @@ AS_type <- sub('.+all_sample_', '', input_file)
 AS_type <- sub('.tsv', '', AS_type)
 
 dfm <- read.table(input_file, head=T)
-colnames(dfm) <- sub('\\.', '-', colnames(dfm))  #correct sample names which have '-' 
+colnames(dfm) <- gsub('\\.', '-', colnames(dfm))  #correct sample names which have '-' 
 grp <- config$groups
 
 test_result <- list()
