@@ -24,6 +24,9 @@ groups:
   - KO
   - KO
 
+design_table: design_table.tsv
+#design_table: none
+
 group_vs: 
   - 1 4
 
