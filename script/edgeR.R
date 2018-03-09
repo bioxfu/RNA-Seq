@@ -20,8 +20,13 @@ fc <- config$fold_change
 p_cutoff <- 0.05
 fc_cutoff <- log2(fc)
 group <- factor(config$groups)
-VS <- as.data.frame(t(combn(unique(config$groups), 2)), stringsAsFactors = F)
-colnames(VS) <- c('Ctrl', 'Expt')
+
+if(config$design_table == 'none') {
+  VS <- as.data.frame(t(combn(unique(config$groups), 2)), stringsAsFactors = F)
+  colnames(VS) <- c('Ctrl', 'Expt')
+}else {
+  VS <- read.table(config$design_table, sep='\t', header = T, stringsAsFactors = F)
+}
 
 ## reading the data into the DGEList object ##
 print(group)
@@ -87,13 +92,13 @@ upmax <- 1.2*max(regulate.stat['up',], na.rm=T)
 dnmax <- 1.2*max(regulate.stat['down',], na.rm=T)
 
 pdf('figure/DEG_barplot.pdf')
-par(mar=c(8,4,4,2))
-barplot(regulate.stat[1,], ylim=c(-dnmax,upmax), col=cols[2], border=cols[2], yaxt='n', las=2)
+par(mar=c(12,4,4,2))
+barplot(regulate.stat[1,], ylim=c(-dnmax,upmax), col=cols[2], border=cols[2], yaxt='n', las=2, cex.names = 0.5)
 bp <- barplot(-regulate.stat[2,], add=T, names=NA, col=cols[3], border=cols[3], ylab='The number of DEGs', yaxt='n')
 axis(2,at=pretty(0:upmax), label=pretty(0:upmax))
 axis(2,at=-pretty(0:dnmax), label=pretty(0:dnmax))
-text(bp,regulate.stat[1,], regulate.stat[1,], pos=3)
-text(bp,-regulate.stat[2,], regulate.stat[2,], pos=1)
+text(bp,regulate.stat[1,], regulate.stat[1,], pos=3, cex=0.5)
+text(bp,-regulate.stat[2,], regulate.stat[2,], pos=1, cex=0.5)
 legend('topright', c('up','down'), fill=cols[2:3], bty='n',border=F)
 dev.off()
 
