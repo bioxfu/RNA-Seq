@@ -17,4 +17,5 @@ Snakefile
 config.yaml
 doc/environment.yml
 download_sra.sh
+design_table.tsv
 
