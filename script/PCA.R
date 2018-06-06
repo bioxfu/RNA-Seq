@@ -22,14 +22,17 @@ prop_var <- round(summary(pca)$importance[2,1:2]*100,0)
 set2_cols <- brewer.pal(8, 'Set1')
 cols <- rep(set2_cols, each=config$seq_info$replicate)
 
-pdf(pca_output, hei=5, wid=5)
-par(mar=c(5,4,4,4))
+pdf(pca_output, hei=7, wid=7)
+layout(matrix(c(1,2),nrow=1), wid=c(5, 2))
+par(mar=c(5,4,4,0))
 par(xpd=TRUE)
 plot(x[,1], x[,2], xlim=range(x[,1])*1.1, ylim=range(x[,2])*1.1, col=cols, cex=1, type='n',
      xlab=paste0('PC1 (',prop_var[1],'% of Variance)'),
      ylab=paste0('PC2 (',prop_var[2],'% of Variance)')
 )
 text(x[,1], x[,2], colnames(cpm), col=cols)
-legend(max(x[,1]*1.2), mean(x[,2]), unique(config$groups), pch = 1, col=set2_cols, bty='n')
+par(mar=c(5,0,4,0))
+plot.new()
+legend('left', unique(config$groups), pch = 1, col=set2_cols, bty='n')
 dev.off()
 
