@@ -29,8 +29,10 @@ rule fastqc_raw_PE:
 	output:
 		'fastqc/raw/{sample}_R1_fastqc.html',
 		'fastqc/raw/{sample}_R2_fastqc.html'
+	params:
+		conda = config['conda_path']
 	shell:
-		'fastqc -t 2 -o fastqc/raw {input}'
+		'{params.conda}/fastqc -t 2 -o fastqc/raw {input}'
 
 rule trimmomatic_PE:
 	input:
@@ -42,9 +44,10 @@ rule trimmomatic_PE:
 		r1_unpaired = 'clean/{sample}_R1_unpaired.fastq.gz',
 		r2_unpaired = 'clean/{sample}_R2_unpaired.fastq.gz'
 	params:
-		adapter = config['adapter']
+		adapter = config['adapter'],
+		conda = config['conda_path']
 	shell:
-		'trimmomatic PE -threads 3 -phred33 {input.r1} {input.r2} {output.r1_paired} {output.r1_unpaired} {output.r2_paired} {output.r2_unpaired} ILLUMINACLIP:{params.adapter}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36'
+		'{params.conda}/trimmomatic PE -threads 3 -phred33 {input.r1} {input.r2} {output.r1_paired} {output.r1_unpaired} {output.r2_paired} {output.r2_unpaired} ILLUMINACLIP:{params.adapter}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36'
 
 rule fastqc_clean_PE:
 	input:
@@ -53,8 +56,10 @@ rule fastqc_clean_PE:
 	output:
 		'fastqc/clean/{sample}_R1_paired_fastqc.html',
 		'fastqc/clean/{sample}_R2_paired_fastqc.html'
+	params:
+		conda = config['conda_path']
 	shell:
-		'fastqc -t 2 -o fastqc/clean {input}'
+		'{params.conda}/fastqc -t 2 -o fastqc/clean {input}'
 
 rule fastqc_stat_PE:
 	input:
@@ -79,17 +84,20 @@ rule hisat2_PE:
 		prefix = 'bam/{sample}',
 		cpu = config['cpu'],
 		index = config['index'],
-		strandness_hisat2 = config['strandness_hisat2']
+		strandness_hisat2 = config['strandness_hisat2'],
+		conda = config['conda_path']		
 	shell:
-		"hisat2 --rna-strandness {params.strandness_hisat2} -p {params.cpu} --dta -x {params.index} -1 {input.r1} -2 {input.r2} |samtools view -Shub|samtools sort - -T {params.prefix} -o {output.bam}"
+		"{params.conda}/hisat2 --rna-strandness {params.strandness_hisat2} -p {params.cpu} --dta -x {params.index} -1 {input.r1} -2 {input.r2} |samtools view -Shub|samtools sort - -T {params.prefix} -o {output.bam}"
 
 rule bam_idx:
 	input:
 		bam = 'bam/{sample}.bam'
 	output:
 		bai = 'bam/{sample}.bam.bai'
+	params:
+		conda = config['conda_path']
 	shell:
-		'samtools index {input.bam} {output.bai}'
+		'{params.conda}/samtools index {input.bam} {output.bai}'
 
 rule bam_qc:
 	input:
@@ -98,9 +106,10 @@ rule bam_qc:
 		bamqc_dir = 'bam/{sample}.bamqc',
 		bamqc_html = 'bam/{sample}.bamqc/qualimapReport.html'
 	params:
-		cpu = config['cpu']
+		cpu = config['cpu'],
+		conda = config['conda_path']
 	shell:
-		"qualimap bamqc --java-mem-size=10G -nt {params.cpu} -bam {input.bam} -outdir {output.bamqc_dir}"
+		"{params.conda}/qualimap bamqc --java-mem-size=10G -nt {params.cpu} -bam {input.bam} -outdir {output.bamqc_dir}"
 
 rule bam_qc_stat:
 	input:
@@ -120,15 +129,17 @@ rule infer_strand_spec:
 	params:
 		bed = config['bed']
 	shell:
-		'/home/xfu/Python/rseqc/bin/infer_experiment.py -r {params} -i {input} > {output}'
+		'/cluster/home/xfu/Python/rseqc/bin/infer_experiment.py -r {params} -i {input} > {output}'
 
 rule sort_bam_by_name:
 	input:
 		'bam/{sample}.bam'
 	output:
 		'count/{sample}_sort_name.bam'
+	params:
+		conda = config['conda_path']
 	shell:
-		'samtools sort -n {input} -o {output}'
+		'{params.conda}/samtools sort -n {input} -o {output}'
 
 rule htseq:
 	input:
@@ -137,17 +148,20 @@ rule htseq:
 		cnt = 'count/{sample}_cnt.tsv'
 	params:
 		gtf = config['gtf'],
-		strandness_htseq = config['strandness_htseq']
+		strandness_htseq = config['strandness_htseq'],
+		conda = config['conda_path']		
 	shell:
-		"htseq-count --format=bam --order=name --stranded={params.strandness_htseq} {input.bam} {params.gtf} > {output.cnt}"
+		"{params.conda}/htseq-count --format=bam --order=name --stranded={params.strandness_htseq} {input.bam} {params.gtf} > {output.cnt}"
 
 rule bam2count:
 	input:
 		bam = 'bam/{sample}.bam'
 	output:
 		cnt = 'bam/{sample}.cnt'
+	params:
+		conda = config['conda_path']
 	shell:
-		"samtools view -c -F 4 {input.bam} > {output.cnt}"
+		"{params.conda}/samtools view -c -F 4 {input.bam} > {output.cnt}"
 		
 rule bam2bedgraph:
 	input:
@@ -155,9 +169,11 @@ rule bam2bedgraph:
 		cnt = 'bam/{sample}.cnt'
 	output:
 		bg = 'track/{sample}.bedgraph'
+	params:
+		conda = config['conda_path']
 	shell:
 		"X=`awk '{{print 1/$1*1000000}}' {input.cnt}`; "
-		"bedtools genomecov -ibam {input.bam} -bga -scale $X -split > {output.bg}"
+		"{params.conda}/bedtools genomecov -ibam {input.bam} -bga -scale $X -split > {output.bg}"
 
 rule bedgraph2tdf:
 	input:
@@ -165,9 +181,10 @@ rule bedgraph2tdf:
 	output:
 		tdf = 'track/{sample}.tdf'
 	params:
-		IGV = config['IGV']
+		IGV = config['IGV'],
+		conda = config['conda_path']		
 	shell:
-		"igvtools toTDF {input.bg} {output.tdf} {params.IGV}"
+		"{params.conda}/igvtools toTDF {input.bg} {output.tdf} {params.IGV}"
 
 rule all_sample_cnt:
 	input:

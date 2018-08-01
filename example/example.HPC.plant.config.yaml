@@ -47,6 +47,8 @@ strandness_htseq: reverse
 
 Rscript_path: /cluster/home/xfu/R/3.5.1/bin/Rscript
 
+conda_path: /cluster/home/xfu/miniconda2/envs/gmatic/bin
+
 adapter: /cluster/home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/TruSeq3-PE-2.fa
 
 index: /cluster/home/xfu/Gmatic7/genome/tair10/hisat2/tair10
