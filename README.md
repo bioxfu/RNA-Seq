@@ -54,7 +54,7 @@ source init.sh
 ./dry_run.sh
 ```
 
-### 8. Start the workflow
+### 8. Run the workflow
 ```
 # if you are working on the HPC
 ./run_HPC.sh
@@ -64,6 +64,12 @@ source init.sh
 
 # check the workflow progress in nohup.out file
 tail nohup.log 
+
+# check the jobs on HPC
+qstat
+
+# if you get the error: Directory cannot be locked.
+snakemake --unlock 
 ```
 
 ### 9. Remove the temporary files
