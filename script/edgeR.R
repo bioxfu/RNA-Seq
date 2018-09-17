@@ -30,9 +30,8 @@ if(config$design_table == 'none') {
 
 ## reading the data into the DGEList object ##
 print(group)
-y <- DGEList(counts = count, group = group)
-geneLength <- read.table('./script/tair10_merged_exons_length.tsv', row.names = 1, header = T)$Length
-y$genes$Length <- geneLength
+geneLength <- read.table('./script/tair10_merged_exons_length.tsv', row.names = 1, header = T)
+y <- DGEList(counts = count, group = group, genes = geneLength)
 
 ## filtering lowly expressed genes ##
 minGroupSize <- min(table(group))
