@@ -31,6 +31,8 @@ if(config$design_table == 'none') {
 ## reading the data into the DGEList object ##
 print(group)
 y <- DGEList(counts = count, group = group)
+geneLength <- read.table('./script/tair10_merged_exons_length.tsv', row.names = 1, header = T)$Length
+y$genes$Length <- geneLength
 
 ## filtering lowly expressed genes ##
 minGroupSize <- min(table(group))
@@ -45,6 +47,8 @@ y <- estimateTagwiseDisp(y)
 
 ## exact test ##
 expr_cols <- round(cpm(y), 2)
+rpkm_cols <- round(rpkm(y), 2)
+
 regulate_cols <- NULL
 logfc_cols <- NULL
 fdr_cols <- NULL
@@ -70,16 +74,24 @@ for(i in 1:(nrow(VS))){
   cat(paste('DOWN-regulated in', exp, sum(de < 0), 'genes\n'))
 }
 
-expr_table <- as.data.frame(cbind(expr_cols, regulate_cols, logfc_cols, fdr_cols), stringsAsFactors = F)
-
 anno <- read.table(config$gene_anno, sep='\t', header = T, quote = '', row.names = 1)
+# Computes counts per million (CPM) #
+expr_table <- as.data.frame(cbind(expr_cols, regulate_cols, logfc_cols, fdr_cols), stringsAsFactors = F)
 expr_table <- merge(expr_table, anno, by.x = 0, by.y = 0, all.x = T)
 colnames(expr_table)[1] <- 'Gene'
-
 DEG_table <- expr_table[rowSums(regulate_cols != 0) >= 1,]
-
 write.table(expr_table, 'table/expr_table_cpm_all.tsv', row.names=F, sep='\t', quote=F)
 write.table(DEG_table, 'table/expr_table_cpm_DEG.tsv', row.names=F, sep='\t', quote=F)
+########
+
+# reads per kilobase per million (RPKM) #
+rpkm_table <- as.data.frame(cbind(rpkm_cols, regulate_cols, logfc_cols, fdr_cols), stringsAsFactors = F)
+rpkm_table <- merge(rpkm_table, anno, by.x = 0, by.y = 0, all.x = T)
+colnames(rpkm_table)[1] <- 'Gene'
+rpkm_DEG_table <- rpkm_table[rowSums(regulate_cols != 0) >= 1,]
+write.table(rpkm_table, 'table/expr_table_rpkm_all.tsv', row.names=F, sep='\t', quote=F)
+write.table(rpkm_DEG_table, 'table/expr_table_rpkm_DEG.tsv', row.names=F, sep='\t', quote=F)
+########
 
 save(list = c('expr_table', 'DEG_table'), file = 'RData/edgeR_output.RData')
 
