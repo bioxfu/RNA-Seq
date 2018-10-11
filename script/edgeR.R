@@ -79,8 +79,8 @@ expr_table <- as.data.frame(cbind(expr_cols, regulate_cols, logfc_cols, fdr_cols
 expr_table <- merge(expr_table, anno, by.x = 0, by.y = 0, all.x = T)
 colnames(expr_table)[1] <- 'Gene'
 DEG_table <- expr_table[rowSums(regulate_cols != 0) >= 1,]
-write.table(expr_table, 'table/expr_table_cpm_all.tsv', row.names=F, sep='\t', quote=F)
-write.table(DEG_table, 'table/expr_table_cpm_DEG.tsv', row.names=F, sep='\t', quote=F)
+write.table(expr_table, paste0('table/CPM_table_FDR0.05_FC', fc, '_all.tsv'), row.names=F, sep='\t', quote=F)
+write.table(DEG_table, paste0('table/CPM_table_FDR0.05_FC', fc, '_DEG.tsv'), row.names=F, sep='\t', quote=F)
 ########
 
 # reads per kilobase per million (RPKM) #
@@ -88,11 +88,11 @@ rpkm_table <- as.data.frame(cbind(rpkm_cols, regulate_cols, logfc_cols, fdr_cols
 rpkm_table <- merge(rpkm_table, anno, by.x = 0, by.y = 0, all.x = T)
 colnames(rpkm_table)[1] <- 'Gene'
 rpkm_DEG_table <- rpkm_table[rowSums(regulate_cols != 0) >= 1,]
-write.table(rpkm_table, 'table/expr_table_rpkm_all.tsv', row.names=F, sep='\t', quote=F)
-write.table(rpkm_DEG_table, 'table/expr_table_rpkm_DEG.tsv', row.names=F, sep='\t', quote=F)
+write.table(rpkm_table, paste0('table/RPKM_table_FDR0.05_FC', fc, '_all.tsv'), row.names=F, sep='\t', quote=F)
+write.table(rpkm_DEG_table, paste0('table/RPKM_table_FDR0.05_FC', fc, '_DEG.tsv'), row.names=F, sep='\t', quote=F)
 ########
 
-save(list = c('expr_table', 'DEG_table'), file = 'RData/edgeR_output.RData')
+save(list = c('expr_table', 'DEG_table'), file = paste0('RData/edgeR_output_FDR0.05_FC', fc, '.RData'))
 
 ## Number of DEGs (barplot)
 regulate.stat <- apply(as.matrix(regulate_cols), 2, function(x){table(x)[c('1','-1')]})
@@ -102,7 +102,7 @@ cols <- brewer.pal(3,'Set1')
 upmax <- 1.2*max(regulate.stat['up',], na.rm=T)
 dnmax <- 1.2*max(regulate.stat['down',], na.rm=T)
 
-pdf('figure/DEG_barplot.pdf')
+pdf(paste0('figure/DEG_barplot_FDR0.05_FC', fc, '.pdf'))
 par(mar=c(12,4,4,2))
 barplot(regulate.stat[1,], ylim=c(-dnmax,upmax), col=cols[2], border=cols[2], yaxt='n', las=2, cex.names = 0.5)
 bp <- barplot(-regulate.stat[2,], add=T, names=NA, col=cols[3], border=cols[3], ylab='The number of DEGs', yaxt='n')

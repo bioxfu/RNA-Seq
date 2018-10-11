@@ -68,4 +68,6 @@ AStype:
   - ALE
   - MXE
 
-fold_change: 1.5
+fold_change: 
+  - 1.5
+  - 2

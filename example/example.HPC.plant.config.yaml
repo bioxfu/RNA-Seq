@@ -61,4 +61,6 @@ gene_anno: /cluster/home/xfu/Gmatic7/gene/tair10/tair10_gene_anno.tsv
 
 IGV: /cluster/home/xfu/igv/genomes/tair10.genome
 
-fold_change: 1.5
+fold_change: 
+  - 1.5
+  - 2

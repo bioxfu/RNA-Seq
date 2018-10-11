@@ -16,10 +16,12 @@ rule all:
 		expand('stat/bamqc_stat.tsv'),
 		expand('count/{sample}_cnt.tsv', sample=config['samples']),
 		'count/all_sample_cnt.tsv',
-		'table/expr_table_cpm_all.tsv',
-		'table/expr_table_cpm_DEG.tsv',
-		'figure/DEG_barplot.pdf',
-		'RData/edgeR_output.RData',
+		expand('table/CPM_table_FDR0.05_FC{fc}_all.tsv', fc=config['fold_change']),
+		expand('table/CPM_table_FDR0.05_FC{fc}_DEG.tsv', fc=config['fold_change']),
+		expand('table/RPKM_table_FDR0.05_FC{fc}_all.tsv', fc=config['fold_change']),
+		expand('table/RPKM_table_FDR0.05_FC{fc}_DEG.tsv', fc=config['fold_change']),
+		expand('figure/DEG_barplot_FDR0.05_FC{fc}.pdf', fc=config['fold_change']),
+		expand('RData/edgeR_output_FDR0.05_FC{fc}.RData', fc=config['fold_change']),
 		'figure/PCA.pdf',
 
 rule fastqc_raw_PE:
@@ -201,19 +203,22 @@ rule edgeR:
 	input:
 		count_all = 'count/all_sample_cnt.tsv',
 	output:
-		cpm_all = 'table/expr_table_cpm_all.tsv',
-		cpm_DEG = 'table/expr_table_cpm_DEG.tsv',
-		DEG_barplot = 'figure/DEG_barplot.pdf',
-		RData = 'RData/edgeR_output.RData'
+		'table/CPM_table_FDR0.05_FC{fc}_all.tsv',
+		'table/CPM_table_FDR0.05_FC{fc}_DEG.tsv',
+		'table/RPKM_table_FDR0.05_FC{fc}_all.tsv',
+		'table/RPKM_table_FDR0.05_FC{fc}_DEG.tsv',
+		'figure/DEG_barplot_FDR0.05_FC{fc}.pdf',
+		'RData/edgeR_output_FDR0.05_FC{fc}.RData',
 	params:
 		config_file = 'config.yaml',
 		Rscript = config['Rscript_path']
 	shell:
 		'{params.Rscript} script/edgeR.R {params.config_file} {input}'
 
+
 rule PCA:
 	input:
-		cpm_all = 'table/expr_table_cpm_all.tsv'
+		cpm_all = 'table/CPM_table_FDR0.05_FC1.5_all.tsv'
 	output:
 		pca_output = 'figure/PCA.pdf'
 	params:

@@ -27,11 +27,12 @@ rule all:
 		expand('AS/{sample}/A3SS.txt', sample=config['samples']),
 		expand('AS/{sample}/A5SS.txt', sample=config['samples']),
 		expand('AS/all_sample_{AStype}_fisher_test.tsv', AStype=config['AStype']),
-		'table/expr_table_cpm_all.tsv',
-		'table/expr_table_cpm_DEG.tsv',
-		'figure/DEG_barplot.pdf',
-		#'figure/DEG_matrix.pdf',
-		'RData/edgeR_output.RData',
+		expand('table/CPM_table_FDR0.05_FC{fc}_all.tsv', fc=config['fold_change']),
+		expand('table/CPM_table_FDR0.05_FC{fc}_DEG.tsv', fc=config['fold_change']),
+		expand('table/RPKM_table_FDR0.05_FC{fc}_all.tsv', fc=config['fold_change']),
+		expand('table/RPKM_table_FDR0.05_FC{fc}_DEG.tsv', fc=config['fold_change']),
+		expand('figure/DEG_barplot_FDR0.05_FC{fc}.pdf', fc=config['fold_change']),
+		expand('RData/edgeR_output_FDR0.05_FC{fc}.RData', fc=config['fold_change']),
 		'figure/PCA.pdf',
 #		if no replicate is available:
 #		'table/expr_table_cpm_no_replicate.tsv',
@@ -272,16 +273,28 @@ rule edgeR:
 	input:
 		count_all = 'count/all_sample_cnt.tsv',
 	output:
-		cpm_all = 'table/expr_table_cpm_all.tsv',
-		cpm_DEG = 'table/expr_table_cpm_DEG.tsv',
-		DEG_barplot = 'figure/DEG_barplot.pdf',
-		#DEG_matrix = 'figure/DEG_matrix.pdf',
-		RData = 'RData/edgeR_output.RData'
+		'table/CPM_table_FDR0.05_FC{fc}_all.tsv',
+		'table/CPM_table_FDR0.05_FC{fc}_DEG.tsv',
+		'table/RPKM_table_FDR0.05_FC{fc}_all.tsv',
+		'table/RPKM_table_FDR0.05_FC{fc}_DEG.tsv',
+		'figure/DEG_barplot_FDR0.05_FC{fc}.pdf',
+		'RData/edgeR_output_FDR0.05_FC{fc}.RData',
 	params:
 		config_file = 'config.yaml',
 		Rscript = config['Rscript_path']
 	shell:
 		'{params.Rscript} script/edgeR.R {params.config_file} {input}'
+
+rule PCA:
+	input:
+		cpm_all = 'table/CPM_table_FDR0.05_FC1.5_all.tsv'
+	output:
+		pca_output = 'figure/PCA.pdf'
+	params:
+		config_file = 'config.yaml',
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/PCA.R {params.config_file} {input} {output}'
 
 rule edgeR_no_replicate:
 	input:
@@ -294,13 +307,3 @@ rule edgeR_no_replicate:
 	shell:
 		'{params.Rscript} script/edgeR_no_replicate.R {params.config_file} {input}'
 
-rule PCA:
-	input:
-		cpm_all = 'table/expr_table_cpm_all.tsv'
-	output:
-		pca_output = 'figure/PCA.pdf'
-	params:
-		config_file = 'config.yaml',
-		Rscript = config['Rscript_path']
-	shell:
-		'{params.Rscript} script/PCA.R {params.config_file} {input} {output}'
