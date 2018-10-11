@@ -203,12 +203,12 @@ rule edgeR:
 	input:
 		count_all = 'count/all_sample_cnt.tsv',
 	output:
-		'table/CPM_table_FDR0.05_FC{fc}_all.tsv',
-		'table/CPM_table_FDR0.05_FC{fc}_DEG.tsv',
-		'table/RPKM_table_FDR0.05_FC{fc}_all.tsv',
-		'table/RPKM_table_FDR0.05_FC{fc}_DEG.tsv',
-		'figure/DEG_barplot_FDR0.05_FC{fc}.pdf',
-		'RData/edgeR_output_FDR0.05_FC{fc}.RData',
+		['table/CPM_table_FDR0.05_FC{fc}_all.tsv'.format(fc=x) for x in config['fold_change']],
+		['table/CPM_table_FDR0.05_FC{fc}_DEG.tsv'.format(fc=x) for x in config['fold_change']],
+		['table/RPKM_table_FDR0.05_FC{fc}_all.tsv'.format(fc=x) for x in config['fold_change']],
+		['table/RPKM_table_FDR0.05_FC{fc}_DEG.tsv'.format(fc=x) for x in config['fold_change']],
+		['figure/DEG_barplot_FDR0.05_FC{fc}.pdf'.format(fc=x) for x in config['fold_change']],
+		['RData/edgeR_output_FDR0.05_FC{fc}.RData'.format(fc=x) for x in config['fold_change']],
 	params:
 		config_file = 'config.yaml',
 		Rscript = config['Rscript_path']
