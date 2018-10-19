@@ -33,7 +33,7 @@ for (fc in fc_lst) {
   
   ## reading the data into the DGEList object ##
   print(group)
-  geneLength <- read.table('./script/tair10_merged_exons_length.tsv', row.names = 1, header = T)
+  geneLength <- read.table(config$gene_length, row.names = 1, header = T)
   y <- DGEList(counts = count, group = group, genes = geneLength)
   
   ## filtering lowly expressed genes ##

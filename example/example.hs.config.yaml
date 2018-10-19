@@ -53,6 +53,8 @@ bed: /home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26.bed
 
 gene_anno: /home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26_gene_type
 
+gene_length: ./script/hg38_merged_exons_length.tsv
+
 AS: /home/xfu/Gmatic6/gene/hg38_v26/ASTA/gencode_astalavista.bed
 
 AS_RI:  /home/xfu/Gmatic6/gene/hg38_v26/ASTA/gencode_astalavista_RI.bed

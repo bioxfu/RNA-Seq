@@ -53,6 +53,8 @@ bed: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13.bed
 
 gene_anno: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13_gene_type
 
+gene_length: ./script/mm10_merged_exons_length.tsv
+
 AS: /home/xfu/Gmatic6/gene/mm10_vM13/ASTA/gencode_astalavista.bed
 
 AS_RI:  /home/xfu/Gmatic6/gene/mm10_vM13/ASTA/gencode_astalavista_RI.bed

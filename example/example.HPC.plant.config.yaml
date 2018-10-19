@@ -59,6 +59,8 @@ bed: /cluster/home/xfu/Gmatic7/gene/tair10/tair10_gene.bed
 
 gene_anno: /cluster/home/xfu/Gmatic7/gene/tair10/tair10_gene_anno.tsv
 
+gene_length: ./script/tair10_merged_exons_length.tsv
+
 IGV: /cluster/home/xfu/igv/genomes/tair10.genome
 
 fold_change: 
