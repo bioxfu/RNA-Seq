@@ -51,7 +51,7 @@ gtf: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13.gtf
 
 bed: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13.bed
 
-gene_anno: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13_gene_type
+gene_anno: /home/xfu/Gmatic6/gene/mm10_vM13/gencode_mm10_vM13_gene_type_name
 
 gene_length: ./script/mm10_merged_exons_length.tsv
 
