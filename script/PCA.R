@@ -11,7 +11,7 @@ pca_output <- argv[3]
 
 # load data
 config <- yaml.load_file(config_file)
-cpm <- read.table(cpm_all, head=T, row.names = 1, sep='\t', quote = '')
+cpm <- read.table(cpm_all, head=T, row.names = 1, sep='\t', quote = '', comment.char = '')
 cpm <- cpm[1:(grep('_vs_', colnames(cpm))[1] - 1)]
 cpm <- log2(cpm+1)
 pca <- prcomp(t(cpm), center = T, scale. = T)

@@ -76,7 +76,7 @@ for (fc in fc_lst) {
     cat(paste('DOWN-regulated in', exp, sum(de < 0), 'genes\n'))
   }
   
-  anno <- read.table(config$gene_anno, sep='\t', header = T, quote = '', row.names = 1)
+  anno <- read.table(config$gene_anno, sep='\t', header = T, quote = '', row.names = 1, comment.char = '')
   # Computes counts per million (CPM) #
   expr_table <- as.data.frame(cbind(expr_cols, regulate_cols, logfc_cols, fdr_cols), stringsAsFactors = F)
   expr_table <- merge(expr_table, anno, by.x = 0, by.y = 0, all.x = T)
