@@ -75,7 +75,7 @@ IGV: /cluster/home/xfu/igv/genomes/tair10.genome
 # 
 #bed: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_gene.bed
 # 
-#gene_anno: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_gene_anno.tsv
+#gene_anno: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_gene_anno_ath.tsv
 # 
 #gene_length: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_merged_exons_length.tsv
 # 
