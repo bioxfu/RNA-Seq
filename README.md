@@ -77,3 +77,9 @@ snakemake --unlock
 ./clean.sh
 ```
 
+### 10. Remove unwanted variation from RNA-Seq data
+```
+## remove batch effect using RUV
+/cluster/home/xfu/R/3.5.1/bin/Rscript
+ script/RUVSeq.R
+```
