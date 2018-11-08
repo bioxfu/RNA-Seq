@@ -68,6 +68,9 @@ tail nohup.log
 # check the jobs on HPC
 qstat
 
+# to delete all the jobs at once
+qselect -u <username> | xargs qdel
+
 # if you get the error: Directory cannot be locked.
 snakemake --unlock 
 ```
