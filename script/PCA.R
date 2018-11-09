@@ -20,7 +20,15 @@ x <- pca$x
 prop_var <- round(summary(pca)$importance[2,1:2]*100,0)
 
 set2_cols <- brewer.pal(8, 'Set1')
-cols <- rep(set2_cols, each=config$seq_info$replicate)
+if (grepl('+', config$seq_info$replicate)) {
+  num <- as.numeric(unlist(strsplit(config$seq_info$replicate, '+', fixed = T)))
+  cols <- NULL
+  for (i in 1:length(num)) {
+    cols <- c(cols, rep(set2_cols[i], each=num[i]))
+  }
+}else {
+  cols <- rep(set2_cols, each=config$seq_info$replicate)
+}
 
 pdf(pca_output, hei=7, wid=7)
 layout(matrix(c(1,2),nrow=1), wid=c(5, 2))

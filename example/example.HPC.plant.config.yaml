@@ -5,6 +5,7 @@ seq_info:
   stranded: yes
   mode: PE
   replicate: 3
+  #replicate: 3+4+3+3 (if the number of replicates are different for each sample)
 
 path: /cluster/home/xfu/Project/ZHM_20180801/RNA-Seq/fastq/
 
