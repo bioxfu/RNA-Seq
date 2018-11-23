@@ -62,7 +62,7 @@ rule trimmomatic_PE:
 		r1_unpaired = 'clean/{sample}_R1_unpaired.fastq.gz',
 		r2_unpaired = 'clean/{sample}_R2_unpaired.fastq.gz'
 	params:
-		conda = config['conda_path']
+		conda = config['conda_path'],
 		adapter = config['adapter']
 	shell:
 		'{params.conda}/trimmomatic PE -threads 3 -phred33 {input.r1} {input.r2} {output.r1_paired} {output.r1_unpaired} {output.r2_paired} {output.r2_unpaired} ILLUMINACLIP:{params.adapter}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36'
@@ -99,7 +99,7 @@ rule hisat2_PE:
 	output:
 		bam = 'bam/{sample}.bam'
 	params:
-		conda = config['conda_path']
+		conda = config['conda_path'],
 		prefix = 'bam/{sample}',
 		cpu = config['cpu'],
 		index = config['index'],
@@ -124,7 +124,7 @@ rule bam_qc:
 		bamqc_dir = 'bam/{sample}.bamqc',
 		bamqc_html = 'bam/{sample}.bamqc/qualimapReport.html'
 	params:
-		conda = config['conda_path']
+		conda = config['conda_path'],
 		cpu = config['cpu']
 	shell:
 		"{params.conda}/qualimap bamqc --java-mem-size=10G -nt {params.cpu} -bam {input.bam} -outdir {output.bamqc_dir}"
@@ -145,7 +145,7 @@ rule infer_strand_spec:
 	output:
 		'bam/{sample}.infer_strand_spec'
 	params:
-		conda = config['conda_path']
+		conda = config['conda_path'],
 		bed = config['bed']
 	shell:
 		'/cluster/home/xfu/Python/rseqc/bin/infer_experiment.py -r {params} -i {input} > {output}'
@@ -166,7 +166,7 @@ rule htseq:
 	output:
 		cnt = 'count/{sample}_cnt.tsv'
 	params:
-		conda = config['conda_path']
+		conda = config['conda_path'],
 		gtf = config['gtf'],
 		strandness_htseq = config['strandness_htseq']
 	shell:
@@ -217,7 +217,7 @@ rule ASFinder:
 		A3SS = 'AS/{sample}/A3SS.txt',
 		A5SS = 'AS/{sample}/A5SS.txt'
 	params:
-		conda = config['conda_path']
+		conda = config['conda_path'],
 		bed = config['AS'],
 		bed_RI = config['AS_RI']
 	shell:
@@ -251,7 +251,7 @@ rule bedgraph2tdf:
 	output:
 		tdf = 'track/{sample}.tdf'
 	params:
-		conda = config['conda_path']
+		conda = config['conda_path'],
 		IGV = config['IGV']
 	shell:
 		"{params.conda}/igvtools toTDF {input.bg} {output.tdf} {params.IGV}"
@@ -262,7 +262,7 @@ rule all_sample_cnt:
 	output:
 		count_all = 'count/all_sample_cnt.tsv',
 	params:
-		conda = config['conda_path']
+		conda = config['conda_path'],
 		config_file = 'config.yaml',
 		Rscript = config['Rscript_path']
 	shell:
