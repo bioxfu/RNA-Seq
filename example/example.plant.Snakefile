@@ -23,6 +23,7 @@ rule all:
 		expand('figure/DEG_barplot_FDR0.05_FC{fc}.pdf', fc=config['fold_change']),
 		expand('RData/edgeR_output_FDR0.05_FC{fc}.RData', fc=config['fold_change']),
 		'figure/PCA.pdf',
+		'figure/DEG_volcano_and_pie.pdf',
 
 rule fastqc_raw_PE:
 	input:
@@ -215,7 +216,6 @@ rule edgeR:
 	shell:
 		'{params.Rscript} script/edgeR.R {params.config_file} {input}'
 
-
 rule PCA:
 	input:
 		cpm_all = 'table/CPM_table_FDR0.05_FC1.5_all.tsv'
@@ -226,4 +226,14 @@ rule PCA:
 		Rscript = config['Rscript_path']
 	shell:
 		'{params.Rscript} script/PCA.R {params.config_file} {input} {output}'
+
+rule volcano:
+	input:
+		'table/RPKM_table_FDR0.05_FC2_all.tsv'
+	output:
+		'figure/DEG_volcano_and_pie.pdf'
+	params:
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/DEG_volcano_and_pie.R {input} {output}'
 
