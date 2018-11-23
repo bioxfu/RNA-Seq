@@ -25,6 +25,7 @@ rule all:
 		'figure/PCA.pdf',
 		'figure/DEG_volcano_and_pie.pdf',
 		'figure/DEG_venn.pdf',
+		'figure/DEG_pheatmap.pdf',
 
 rule fastqc_raw_PE:
 	input:
@@ -247,3 +248,13 @@ rule venn:
 		Rscript = config['Rscript_path']
 	shell:
 		'{params.Rscript} script/DEG_venn.R {input} {output}'
+
+rule pheatmap:
+	input:
+		'table/RPKM_table_FDR0.05_FC2_all.tsv'
+	output:
+		'figure/DEG_pheatmap.pdf'
+	params:
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/DEG_pheatmap.R {input} {output}'
