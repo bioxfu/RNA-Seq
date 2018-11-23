@@ -1,0 +1,85 @@
+species: human
+
+seq_info:
+  type: RNA-Seq
+  stranded: yes
+  mode: PE
+  replicate: 2+4+2+2
+
+path: /home/xfu/Project/XXX/fastq/
+
+samples:
+  - WT_1
+  - WT_2
+  - MeCP2_KO_1
+  - MeCP2_KO_2
+  - MeCP2_KO_3
+  - MeCP2_KO_4
+  - RBFOX2_KO_1
+  - RBFOX2_KO_2
+  - RBFOX2_KI_1
+  - RBFOX2_KI_2
+
+groups:
+  - WT
+  - WT
+  - MeCP2_KO
+  - MeCP2_KO
+  - MeCP2_KO
+  - MeCP2_KO
+  - RBFOX2_KO
+  - RBFOX2_KO
+  - RBFOX2_KI
+  - RBFOX2_KI
+
+design_table: design_table.tsv
+#design_table: none
+
+venn_table: venn_table.tsv
+
+group_vs: 
+  - 1 4
+
+group_info:
+  WT: wild-type
+  KO: knock-out
+
+cpu: 30
+
+strandness_hisat2: R ## R (SE); RF (PE)
+
+strandness_htseq: reverse
+
+Rscript_path: /cluster/home/xfu/R/3.5.1/bin/Rscript
+
+adapter: /cluster/home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/TruSeq3-PE-2.fa
+
+
+index: /cluster/home/xfu/Gmatic6/genome/hg38/hg38
+
+gtf: /cluster/home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26.gtf
+
+bed: /cluster/home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26.bed
+
+gene_anno: /cluster/home/xfu/Gmatic6/gene/hg38_v26/gencode_hg38_v26_gene_type
+
+gene_length: ./script/hg38_merged_exons_length.tsv
+
+AS: /cluster/home/xfu/Gmatic6/gene/hg38_v26/ASTA/gencode_astalavista.bed
+
+AS_RI:  /cluster/home/xfu/Gmatic6/gene/hg38_v26/ASTA/gencode_astalavista_RI.bed
+
+IGV: /cluster/home/xfu/igv/genomes/hg38.genome
+
+AStype:
+  - SE
+  - RI
+  - A3SS
+  - A5SS
+  - AFE
+  - ALE
+  - MXE
+
+fold_change: 
+  - 1.5
+  - 2
