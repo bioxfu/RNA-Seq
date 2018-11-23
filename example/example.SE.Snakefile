@@ -32,6 +32,7 @@ rule all:
 		expand('RData/edgeR_output_FDR0.05_FC{fc}.RData', fc=config['fold_change']),
 		'figure/PCA.pdf',
 		'figure/DEG_volcano_and_pie.pdf',
+		'figure/DEG_venn.pdf',
 #		if no replicate is available:
 #		'table/expr_table_cpm_no_replicate.tsv',
 
@@ -293,6 +294,15 @@ rule volcano:
 	shell:
 		'{params.Rscript} script/DEG_volcano_and_pie.R {input} {output}'
 
+rule venn:
+	input:
+		'table/RPKM_table_FDR0.05_FC2_all.tsv'
+	output:
+		'figure/DEG_venn.pdf'
+	params:
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/DEG_venn.R {input} {output}'
 
 rule edgeR_no_replicate:
 	input:

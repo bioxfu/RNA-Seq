@@ -1,0 +1,5 @@
+Venn	Group	VS	Index
+1	local_up	loc_TYLCV_vs_loc_EV	1
+1	local_down	loc_TYLCV_vs_loc_EV	-1
+1	system_up	sys_TYLCV_vs_sys_EV	1
+1	system_down	sys_TYLCV_vs_sys_EV	-1

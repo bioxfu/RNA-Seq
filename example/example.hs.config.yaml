@@ -28,6 +28,8 @@ groups:
 design_table: design_table.tsv
 #design_table: none
 
+venn_table: venn_table.tsv
+
 group_vs: 
   - 1 4
 

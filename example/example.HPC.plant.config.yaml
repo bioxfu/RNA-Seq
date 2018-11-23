@@ -40,6 +40,8 @@ groups:
 design_table: design_table.tsv
 #design_table: none
 
+venn_table: venn_table.tsv
+
 cpu: 30
 
 strandness_hisat2: RF ## R (SE); RF (PE)
