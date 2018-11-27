@@ -1,5 +1,6 @@
 library(GO.db)
 library(topGO)
+library(xlsx)
 
 gomap <- c(tair10='script/tair10_gene2go.map', niben101='script/Niben101_gene2go.map')
 geneid <- c(tair10='script/tair10_gene2go.geneid', niben101='script/Niben101_gene2go.geneid')
@@ -31,3 +32,13 @@ combine_go_list <- function(go_lst, pvalue=0.01) {
   }
   return(all_mat)
 }
+
+write2xlsx <- function(lst, xlsx_file) {
+  wb <- createWorkbook()
+  for (i in 1:length(lst)) {
+    sheet <- createSheet(wb, sheetName=names(lst)[i])
+    addDataFrame(lst[[i]], sheet, row.names = FALSE)
+  }
+  saveWorkbook(wb, xlsx_file)
+}
+
