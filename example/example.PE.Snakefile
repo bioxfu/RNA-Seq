@@ -145,10 +145,9 @@ rule infer_strand_spec:
 	output:
 		'bam/{sample}.infer_strand_spec'
 	params:
-		conda = config['conda_path'],
 		bed = config['bed']
 	shell:
-		'/cluster/home/xfu/Python/rseqc/bin/infer_experiment.py -r {params} -i {input} > {output}'
+		'/cluster/home/xfu/Python/rseqc/bin/infer_experiment.py -r {params.bed} -i {input} > {output}'
 
 rule sort_bam_by_name:
 	input:
