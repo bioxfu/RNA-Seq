@@ -42,3 +42,12 @@ write2xlsx <- function(lst, xlsx_file) {
   saveWorkbook(wb, xlsx_file)
 }
 
+combine_kegg_list <- function(kegg_lst, pvalue=0.05) {
+  kegg_lst_filt <- lapply(kegg_lst, function(x){x[x$p.adjust<pvalue,]})
+  all_term <- unique(do.call(rbind, kegg_lst_filt)$Description)
+  all_mat <- matrix(nrow=length(all_term), ncol=length(kegg_lst_filt), dimnames=list(all_term, names(kegg_lst)))
+  for (i in 1:length(kegg_lst_filt)) {
+    all_mat[kegg_lst_filt[[i]]$Description, i] <- -log10(kegg_lst_filt[[i]]$p.adjust)
+  }
+  return(all_mat)
+}
