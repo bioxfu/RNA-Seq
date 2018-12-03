@@ -38,11 +38,11 @@ dev.off()
 
 ## KEGG pathway view
 kegg <- c('ath04016', 'ath04075', 'ath04626')
-loc_fc <- unlist(tapply(dfm$loc_TYLCV_vs_loc_EV_logFC, dfm$AthID, mean, simplify = F))
-sys_fc <- unlist(tapply(dfm$sys_TYLCV_vs_sys_EV_logFC, dfm$AthID, mean, simplify = F))
+loc_fc <- unlist(tapply(dfm$loc_TYLCV_vs_loc_EV_logFC[dfm$loc_TYLCV_vs_loc_EV != 0], dfm$AthID[dfm$loc_TYLCV_vs_loc_EV != 0], mean, simplify = F))
+sys_fc <- unlist(tapply(dfm$sys_TYLCV_vs_sys_EV_logFC[dfm$sys_TYLCV_vs_sys_EV != 0], dfm$AthID[dfm$sys_TYLCV_vs_sys_EV != 0], mean, simplify = F))
 
 for (k in kegg) {
   pathview(gene.data = loc_fc, gene.idtype = 'kegg', pathway.id = k, species = 'ath', out.suffix='loc_pathway', kegg.native = T)
-  #pathview(gene.data = sys_fc, gene.idtype = 'kegg', pathway.id = k, species = 'ath', out.suffix='sys_pathway', kegg.native = T)
+  pathview(gene.data = sys_fc, gene.idtype = 'kegg', pathway.id = k, species = 'ath', out.suffix='sys_pathway', kegg.native = T)
 }
 
