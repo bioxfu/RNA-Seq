@@ -23,7 +23,9 @@ topGO <- function(myGenes, category='BP', p_cutoff=0.05, species='tair10'){
   allRes <- allRes[order(allRes$pvalue,decreasing=F),]
   allRes$catagory <- category
   allRes <- allRes[allRes$pvalue < p_cutoff, ]
-  allRes$Term <- apply(allRes, 1, function(x){Term(GOTERM[[x[1]]])})
+  if (nrow(allRes) > 0) {
+    allRes$Term <- apply(allRes, 1, function(x){Term(GOTERM[[x[1]]])})
+  }
   return(allRes)
 }
 
