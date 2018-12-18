@@ -2,8 +2,12 @@ library(GO.db)
 library(topGO)
 library(xlsx)
 
-gomap <- c(tair10='script/tair10_gene2go.map', niben101='script/Niben101_gene2go.map')
-geneid <- c(tair10='script/tair10_gene2go.geneid', niben101='script/Niben101_gene2go.geneid')
+gomap <- c(tair10='script/tair10_gene2go.map', 
+           niben101='script/Niben101_gene2go.map',
+           Bd='script/Bdistachyon_314_v3.1.gene2go.map')
+geneid <- c(tair10='script/tair10_gene2go.geneid', 
+            niben101='script/Niben101_gene2go.geneid',
+            Bd='script/Bdistachyon_314_v3.1.gene2go.geneid')
 
 ### GO annotation
 topGO <- function(myGenes, category='BP', p_cutoff=0.05, species='tair10'){
