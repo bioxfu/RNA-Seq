@@ -43,7 +43,9 @@ write2xlsx <- function(lst, xlsx_file) {
   wb <- createWorkbook()
   for (i in 1:length(lst)) {
     sheet <- createSheet(wb, sheetName=names(lst)[i])
-    addDataFrame(lst[[i]], sheet, row.names = FALSE)
+    if (nrow(lst[[i]]) > 0) {
+      addDataFrame(lst[[i]], sheet, row.names = FALSE)
+    }
   }
   saveWorkbook(wb, xlsx_file)
 }
