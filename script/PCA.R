@@ -20,7 +20,7 @@ x <- pca$x
 prop_var <- round(summary(pca)$importance[2,1:2]*100,0)
 
 set2_cols <- brewer.pal(8, 'Set1')
-if (grepl('+', config$seq_info$replicate)) {
+if (grepl('+', config$seq_info$replicate, fixed = T)) {
   num <- as.numeric(unlist(strsplit(config$seq_info$replicate, '+', fixed = T)))
   cols <- NULL
   for (i in 1:length(num)) {
