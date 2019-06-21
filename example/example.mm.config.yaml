@@ -47,6 +47,8 @@ conda_path: /home/xfu/miniconda2/envs/gmatic/bin
 
 Rscript_path: /home/xfu/R/3.2.4/bin/Rscript
 
+rseqc_path: /home/xfu/Python/rseqc/bin
+
 adapter: /home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/TruSeq3-PE-2.fa
 
 
