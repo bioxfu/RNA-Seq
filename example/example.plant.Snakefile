@@ -231,7 +231,7 @@ rule PCA:
 
 rule volcano:
 	input:
-		'table/RPKM_table_FDR0.05_FC2_all.tsv'
+		'table/RPKM_table_FDR0.05_FC2_DEG.tsv'
 	output:
 		'figure/DEG_volcano_and_pie.pdf'
 	params:
@@ -241,7 +241,7 @@ rule volcano:
 
 rule venn:
 	input:
-		'table/RPKM_table_FDR0.05_FC2_all.tsv'
+		'table/RPKM_table_FDR0.05_FC2_DEG.tsv'
 	output:
 		'figure/DEG_venn.pdf'
 	params:
@@ -251,7 +251,7 @@ rule venn:
 
 rule pheatmap:
 	input:
-		'table/RPKM_table_FDR0.05_FC2_all.tsv'
+		'table/RPKM_table_FDR0.05_FC2_DEG.tsv'
 	output:
 		'figure/DEG_pheatmap.pdf'
 	params:
