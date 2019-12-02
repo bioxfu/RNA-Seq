@@ -92,7 +92,7 @@ rule hisat2_PE:
 		strandness_hisat2 = config['strandness_hisat2'],
 		conda = config['conda_path']		
 	shell:
-		"{params.conda}/hisat2 --rna-strandness {params.strandness_hisat2} -p {params.cpu} --dta -x {params.index} -1 {input.r1} -2 {input.r2} |samtools view -Shub|samtools sort - -T {params.prefix} -o {output.bam}"
+		"{params.conda}/hisat2 --rna-strandness {params.strandness_hisat2} -p {params.cpu} --dta -x {params.index} -1 {input.r1} -2 {input.r2} |{params.conda}/samtools view -Shub|{params.conda}/samtools sort - -T {params.prefix} -o {output.bam}"
 
 rule bam_idx:
 	input:
